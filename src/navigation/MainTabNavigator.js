@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, shadows } from '../styles/theme';
+import { useNavigation } from '@react-navigation/native';
 
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
@@ -58,6 +59,11 @@ const QuickLogFAB = ({ navigation }) => {
   );
 };
 
+const FabOverlay = () => {
+  const navigation = useNavigation();
+  return <QuickLogFAB navigation={navigation} />;
+};
+
 const MainTabNavigator = () => {
   return (
     <View style={{ flex: 1 }}>
@@ -67,7 +73,7 @@ const MainTabNavigator = () => {
         <Tab.Screen name="Stats" component={StatsScreen} />
         <Tab.Screen name="Profile" component={AccountScreen} />
       </Tab.Navigator>
-      {/* FAB needs access to navigation - create a simple hook wrapper */}
+      <FabOverlay />
     </View>
   );
 };
