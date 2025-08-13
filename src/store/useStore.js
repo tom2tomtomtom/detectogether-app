@@ -62,6 +62,27 @@ const useStore = create((set, get) => ({
     get().saveData();
   },
   
+  setPetType: (petType) => {
+    set((state) => ({
+      user: { ...state.user, petType },
+    }));
+    get().saveData();
+  },
+  
+  setPetName: (petName) => {
+    set((state) => ({
+      user: { ...state.user, petName },
+    }));
+    get().saveData();
+  },
+  
+  completeOnboarding: () => {
+    set((state) => ({
+      user: { ...state.user, onboardingComplete: true },
+    }));
+    get().saveData();
+  },
+  
   setPetData: (petData) => {
     set((state) => ({
       pet: { ...state.pet, ...petData },
@@ -213,7 +234,7 @@ const useStore = create((set, get) => ({
         pet: state.pet,
         healthLogs: state.healthLogs,
       };
-      await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
+    await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
     } catch (error) {
       console.error('Error saving user data:', error);
     }
