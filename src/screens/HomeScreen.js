@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MoodSelector from '../components/MoodSelector';
+import PetCharacter from '../components/PetCharacter';
 import { useStore } from '../store/useStore';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
@@ -115,7 +116,14 @@ const HomeScreen = ({ navigation }) => {
               {() => (
                 <View style={styles.progressContent}>
                   <Text style={styles.progressNumber}>{overallScore}%</Text>
-                  <Text style={styles.petEmoji}>{user.petType === 'cat' ? '🐱' : user.petType === 'bird' ? '🐦' : user.petType === 'bunny' ? '🐰' : user.petType === 'dragon' ? '🐉' : '🐕'}</Text>
+                  <View style={styles.petContainer}>
+                    <PetCharacter 
+                      petType={user.petType || 'cat'} 
+                      healthScore={overallScore}
+                      size={60}
+                      isAnimating={true}
+                    />
+                  </View>
                 </View>
               )}
             </AnimatedCircularProgress>
@@ -203,7 +211,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: 100,
+    paddingBottom: 120,
   },
   card: {
     backgroundColor: colors.surface,
@@ -232,15 +240,24 @@ const styles = StyleSheet.create({
   },
   progressContent: {
     alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   progressNumber: {
     fontSize: typography.huge,
     fontWeight: typography.bold,
     color: colors.textPrimary,
+    lineHeight: typography.huge,
+    marginBottom: -10,
   },
-  petEmoji: {
-    fontSize: 80,
-    marginTop: -10,
+  petContainer: {
+    marginTop: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statsRow: {
     flexDirection: 'row',

@@ -32,10 +32,11 @@ const tabIcons = {
 function MainTabNavigator() {
   return (
     <Tab.Navigator
+      safeAreaInsets={{ bottom: 8 }}
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           const iconName = tabIcons[route.name] || 'help-circle';
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Icon name={iconName} size={22} color={color} />;
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textLight,
@@ -98,9 +99,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    paddingBottom: 6,
-    paddingTop: 6,
-    height: 64,
+    paddingTop: 8,
+    paddingBottom: 20,
+    height: 85,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   tabBarItem: {
     marginHorizontal: 6,
