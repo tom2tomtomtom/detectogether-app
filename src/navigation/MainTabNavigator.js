@@ -2,6 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { colors, borderRadius } from '../styles/theme';
 
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
@@ -36,10 +37,12 @@ function MainTabNavigator() {
           const iconName = tabIcons[route.name] || 'help-circle';
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#3B82F6',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textLight,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarItemStyle: styles.tabBarItem,
+        tabBarActiveBackgroundColor: colors.primaryLight,
         headerShown: false,
       })}
     ><Tab.Screen 
@@ -92,12 +95,16 @@ function MainTabNavigator() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingBottom: 5,
-    paddingTop: 5,
-    height: 60,
+    borderTopColor: colors.border,
+    paddingBottom: 6,
+    paddingTop: 6,
+    height: 64,
+  },
+  tabBarItem: {
+    marginHorizontal: 6,
+    borderRadius: 16,
   },
   tabBarLabel: {
     fontSize: 10,

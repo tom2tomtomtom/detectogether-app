@@ -11,8 +11,7 @@ import { registerForPushNotificationsAsync } from './src/services/NotificationSe
 
 export default function App() {
   const initializeApp = useStore((state) => state.initializeApp);
-  // Temporarily bypass onboarding to test
-  const onboardingComplete = true; // useStore((state) => state.user.onboardingComplete);
+  const onboardingComplete = useStore((state) => state.user?.onboardingComplete || false);
 
   useEffect(() => {
     initializeApp();
