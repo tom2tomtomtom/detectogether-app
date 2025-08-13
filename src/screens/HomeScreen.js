@@ -171,7 +171,7 @@ const HomeScreen = ({ navigation }) => {
               <TouchableOpacity
                 key={module.id}
                 style={[styles.card, styles.moduleCard]}
-                onPress={() => navigation.navigate(module.route)}
+                onPress={() => navigation.navigate('Track', { screen: module.route })}
               >
                 <View style={[styles.moduleIcon, { backgroundColor: module.lightColor }]}>
                   <Icon name={module.icon} size={24} color={module.color} />
