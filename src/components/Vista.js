@@ -2,18 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useStore } from '../store/useStore';
+import PetCharacter from './PetCharacter';
 
 const { width } = Dimensions.get('window');
 
 const Vista = ({ tabName, healthScore }) => {
   const vistaState = useStore((state) => state.vistaStates[tabName]);
   const pet = useStore((state) => state.pet);
+  const user = useStore((state) => state.user);
   
   const animationValue = useRef(new Animated.Value(0)).current;
   const petPosition = useRef(new Animated.ValueXY({ x: width / 2 - 25, y: 50 })).current;
 
   useEffect(() => {
-    // Gentle animation loop
+    // Gentle animation loop (kept for potential environment effects)
     Animated.loop(
       Animated.sequence([
         Animated.timing(animationValue, {
@@ -73,41 +75,10 @@ const Vista = ({ tabName, healthScore }) => {
         return ['#f3f4f6', '#e5e7eb'];
     }
   };
-  const renderPet = () => {
-    const petScale = animationValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 1.05],
-    });
 
-    const score = Math.max(0, Math.min(100, typeof healthScore === 'number' ? healthScore : pet.health));
-    const bodyColor = score >= 70 ? '#4ade80' : score >= 40 ? '#fbbf24' : '#f87171';
-    const petOpacity = score / 100;
+  const overallScore = typeof healthScore === 'number' ? healthScore : pet.health;
+  const petType = user.petType || 'dog';
 
-    return (
-      <Animated.View
-        style={[
-          styles.petContainer,
-          {
-            transform: [
-              { translateX: petPosition.x },
-              { translateY: petPosition.y },
-              { scale: petScale },
-            ],
-            opacity: petOpacity,
-          },
-        ]}
-      >
-        <View style={styles.pet}>
-          {/* Simple pet representation - will be replaced with actual graphics */}
-          <View style={[styles.petBody, { backgroundColor: bodyColor }]} />
-          <View style={styles.petEyes}>
-            <View style={styles.eye} />
-            <View style={styles.eye} />
-          </View>
-        </View>
-      </Animated.View>
-    );
-  };
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -133,7 +104,9 @@ const Vista = ({ tabName, healthScore }) => {
         )}
 
         {/* Pet */}
-        {renderPet()}
+        <View style={styles.petWrapper}>
+          <PetCharacter petType={petType} healthScore={overallScore} isAnimating={true} />
+        </View>
       </LinearGradient>
     </View>
   );
@@ -168,32 +141,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#92400e',
     opacity: 0.3,
   },
-  petContainer: {
+  petWrapper: {
     position: 'absolute',
-  },
-  pet: {
-    width: 50,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  petBody: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    position: 'absolute',
-  },
-  petEyes: {
-    flexDirection: 'row',
-    position: 'absolute',
-    top: 12,
-  },
-  eye: {
-    width: 6,
-    height: 6,
-    backgroundColor: '#000',
-    borderRadius: 3,
-    marginHorizontal: 3,
+    left: '50%',
+    marginLeft: -40,
+    top: 50,
   },
 });
 
