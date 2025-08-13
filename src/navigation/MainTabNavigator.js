@@ -19,6 +19,7 @@ import MindRadarScreen from '../screens/MindRadarScreen';
 import DermalMapScreen from '../screens/DermalMapScreen';
 import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
+import AchievementsScreen from '../screens/AchievementsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -87,19 +88,33 @@ const TabNavigator = () => {
   );
 };
 
+const moduleHeaderOptions = (title) => ({
+  headerShown: true,
+  headerTitle: title,
+  headerStyle: {
+    backgroundColor: colors.background,
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+  },
+  headerTintColor: colors.primary,
+  headerTitleStyle: { fontWeight: '600', fontSize: 18 },
+});
+
 const MainStack = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, presentation: 'card' }}>
       <Stack.Screen name="TabNavigator" component={TabNavigator} />
-      {/* Health Module Screens */}
-      <Stack.Screen name="FluidFlow" component={FluidFlowScreen} />
-      <Stack.Screen name="Vitality" component={VitalityScreen} />
-      <Stack.Screen name="Gut" component={GutScreen} />
-      <Stack.Screen name="MindRadar" component={MindRadarScreen} />
-      <Stack.Screen name="DermalMap" component={DermalMapScreen} />
+      {/* Health Module Screens with Headers */}
+      <Stack.Screen name="FluidFlow" component={FluidFlowScreen} options={moduleHeaderOptions('Fluid Flow & Balance')} />
+      <Stack.Screen name="Vitality" component={VitalityScreen} options={moduleHeaderOptions('Vitality Compass')} />
+      <Stack.Screen name="Gut" component={GutScreen} options={moduleHeaderOptions('Gut Intelligence')} />
+      <Stack.Screen name="MindRadar" component={MindRadarScreen} options={moduleHeaderOptions("Mind's Radar")} />
+      <Stack.Screen name="DermalMap" component={DermalMapScreen} options={moduleHeaderOptions('Dermal Map')} />
       {/* Other screens */}
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+      <Stack.Screen name="Achievements" component={AchievementsScreen} />
     </Stack.Navigator>
   );
 };
