@@ -2,8 +2,8 @@
 
 ## Current Project
 - Name: DetecTogether App
-- Type: React Native Mobile App (iOS/Android)
-- Size: ~3,500-4,000 lines
+- Type: React Native Mobile App (Expo) with web-ready scaffolding
+- Size: ~5,000+ lines
 - Status: Core Features Complete (Phase 1 Done!)
 
 ## Tech Stack
@@ -13,13 +13,17 @@
 - UI Components: Custom components with React Native Vector Icons
 - Styling: StyleSheet API
 - Storage: AsyncStorage for persistence
-- Animations: React Native Reanimated 2 (ready for implementation)
+- Animations: React Native Reanimated 2 (PetCharacter integrated)
 
 ## Recent Sessions
 - Session 1: Project initialization and structure setup
 - Session 2: Core navigation and screens created
 - Session 3: Vista component and Fluid Flow module implemented
 - Session 4: Completed ALL 5 health modules + enhanced home dashboard
+- Session 5: PetCharacter animations integrated into Vista
+- Session 6: Onboarding flow with pet selection + naming
+- Session 7: Achievements system (badges, screen, store)
+- Session 8: Expo notifications (service, settings, smart scheduling)
 - Last Updated: 2025-08-13
 
 ## Progress Tracking
@@ -34,18 +38,19 @@
 - [x] Mind's Radar screen
 - [x] Dermal Map screen
 - [x] Account screen (Basic version)
-- [ ] Onboarding flow
-- [ ] Pet selection and animation
-- [ ] Push notifications
+- [x] Onboarding flow
+- [x] Pet selection and animation (baseline: emojis + reanimated states)
+- [x] Push notifications (Expo) with settings
+- [x] Achievement system (badges, progress, notifications)
 - [ ] Photo capture/analysis
 - [ ] Backend API integration
 - [ ] Testing
 - [ ] Deployment
 
 ## Current Features Implemented
-1. **Navigation**: 7-tab bottom navigation with icons
+1. **Navigation**: 8-tab bottom navigation with icons (includes Achievements, Notifications)
 2. **Vista System**: Dynamic gradient backgrounds that change based on health status
-3. **State Management**: Zustand store with user, pet, and health log states
+3. **State Management**: Zustand store with user, pet, health logs, achievements, notifications
 4. **All Health Modules Complete**:
    - Fluid Flow & Balance (hydration tracking)
    - Vitality Compass (energy & caffeine)
@@ -58,71 +63,79 @@
    - Daily goal tracking
    - Recent activity feed
    - Needs attention alerts
-6. **Pet System**: Dynamic health-based appearance (needs animation upgrade)
-7. **Data Persistence**: AsyncStorage integration ready
+   - Achievement toast modal
+6. **Pet System**: `PetCharacter` with reanimated states (happy/normal/sad/critical/celebrating) integrated in `Vista`
+7. **Onboarding**: Welcome, benefits, pet selection carousel, name pet, gating in `App.js`
+8. **Achievements**: Definitions, badge UI, progress + unlocks, points, Achievements screen
+9. **Notifications**: Expo service, smart scheduling, settings screen, morning/hydration/streak/achievement types
+10. **Data Persistence**: AsyncStorage integration
 
 ## Next Steps
-1. Complete remaining health modules (Vitality, Gut, Mind's Radar, Dermal Map)
-2. Implement onboarding flow with pet selection
-3. Add push notification system
-4. Implement camera functionality for photo analysis
-5. Create more sophisticated pet animations
-6. Build out the gamification features (badges, challenges, social)
-7. Add backend API for data sync
-8. Implement proper UI/UX polish
+1. Refine notifications
+   - Module-specific reminders tied to in-module toggles
+   - Deeper response handling (deep link to target module)
+   - Improve smart scheduling windows
+2. Trends & charts
+   - 7/30-day views per module, streak visualizations
+3. Camera & media (Phase 3)
+   - Skin and meal photos; local storage and simple galleries
+4. Backend sync (Phase 4)
+   - Auth + cloud sync (Supabase/Firebase), push token storage
+5. Pet & UX polish
+   - More pet moods (sleeping/idle), richer visuals than emojis
+   - Unify Notification Settings under Account stack
+6. Testing & analytics
+   - Unit/integration/E2E; Sentry + analytics
 
 ## 🎯 PHASE 2: Pet & Gamification (Current Focus)
 
 ### Step 1: Pet Animation System (2-3 hours)
 **Tool**: Cursor
 **Command**: "Add pet animations using React Native Reanimated 2"
-- [ ] Create PetCharacter.js component
-- [ ] Add 5 pet types (dog, cat, bird, bunny, dragon)
-- [ ] Implement mood-based animations:
+- [x] Create PetCharacter.js component
+- [x] Add 5 pet types (dog, cat, bird, bunny, dragon)
+- [x] Implement mood-based animations:
   - Happy: bounce/wiggle
+  - Normal: gentle float
   - Sad: droop/shrink
-  - Sleeping: gentle breathing
-  - Celebrating: spin/jump
-  - Idle: subtle float
-- [ ] Connect animations to health score
-- [ ] Add pet selection to store
+  - Critical: shrink/fade
+  - Celebrating: spin
+- [x] Connect animations to health score
+- [x] Add pet selection to store
+- [ ] Add sleeping/idle variants and richer art
 
 ### Step 2: Onboarding Flow (2 hours)
 **Tool**: Cursor
 **Command**: "Create onboarding screens with pet selection"
-- [ ] Welcome screen with app benefits
-- [ ] Pet selection carousel
-- [ ] Name your pet screen
-- [ ] Notification permissions
+- [x] Welcome screen with app benefits
+- [x] Pet selection carousel
+- [x] Name your pet screen
+- [x] Notification permissions (requested after onboarding)
 - [ ] Quick tutorial (5 swipeable cards)
 - [ ] Set initial health baseline
 
 ### Step 3: Achievement System (2 hours)
 **Tool**: Cursor
 **Command**: "Build achievement/badge system"
-- [ ] Create achievements data structure
-- [ ] Badge components (locked/unlocked states)
-- [ ] Achievement categories:
-  - Consistency badges (7-day streak, 30-day streak)
-  - Module mastery (log 100 times in each module)
-  - Balance badges (all green for a week)
-  - Explorer badges (try all features)
-- [ ] Achievement notifications
-- [ ] Progress tracking in store
+- [x] Create achievements data structure
+- [x] Badge components (locked/unlocked states)
+- [x] Achievement categories (Streaks, Mastery, Balance, Explorer, Special)
+- [x] Achievement notifications
+- [x] Progress tracking in store
 
 ### Step 4: Push Notifications (1-2 hours)
 **Tool**: Cursor + Expo docs
 **Command**: "Set up Expo push notifications"
-- [ ] Install expo-notifications
-- [ ] Create notification service
-- [ ] Implement notification types:
+- [x] Install expo-notifications
+- [x] Create notification service
+- [x] Implement notification types:
   - Morning check-in (8am)
   - Hydration reminders (every 2 hours)
   - Module-specific (based on settings)
   - Streak maintenance
   - Achievement unlocked
-- [ ] Smart scheduling based on user patterns
-- [ ] Notification preferences screen
+- [x] Smart scheduling based on user patterns
+- [x] Notification preferences screen
 
 ## 🎯 PHASE 3: Advanced Features
 
@@ -194,17 +207,17 @@
 - [ ] Production deployment
 
 ## 📊 Time Estimate
-- **Phase 2**: 7-9 hours (Pet & Gamification)
+- **Phase 2**: 6-8 hours (Pet & Gamification)
 - **Phase 3**: 6-8 hours (Advanced Features)
 - **Phase 4**: 8-14 hours (Backend & Deployment)
-- **Total**: 21-31 hours to production
+- **Total**: 20-30 hours to production
 
 ## 🚀 Quick Win Order (If Limited Time)
-1. Pet Animations (biggest impact)
-2. Push Notifications (engagement)
-3. Achievements (retention)
+1. Pet polish (sleeping/idle + art)
+2. Notifications refinements (engagement)
+3. Achievements deepening (retention)
 4. Backend Sync (critical for launch)
-5. Everything else
+5. Trends/charts
 
 ## 💡 Development Tips
 - Test on real devices early
@@ -214,13 +227,11 @@
 - Use React.memo for heavy components
 
 ## Known Issues
-- Pet graphics are placeholder (simple circles) - NEXT PRIORITY
-- No onboarding flow yet - PHASE 2
-- Push notifications not configured - PHASE 2
+- Pet visuals are emoji placeholders; richer art desired
+- Notification Settings temporarily exposed as a tab (to move under Account stack)
 - Camera functionality not implemented - PHASE 3
 - No backend connection - PHASE 4
-- Need achievement system - PHASE 2
-- Missing data visualizations - PHASE 3
+- Trends/visualizations pending - PHASE 3
 
 ## File Structure
 ```
@@ -228,7 +239,12 @@ detectogether-app/
 ├── App.js
 ├── src/
 │   ├── components/
-│   │   └── Vista.js
+│   │   ├── Vista.js
+│   │   ├── PetCharacter.js
+│   │   ├── AchievementBadge.js
+│   │   ├── Button.js
+│   │   ├── Card.js
+│   │   └── Modal.js
 │   ├── navigation/
 │   │   └── MainTabNavigator.js
 │   ├── screens/
@@ -238,11 +254,17 @@ detectogether-app/
 │   │   ├── GutScreen.js
 │   │   ├── MindRadarScreen.js
 │   │   ├── DermalMapScreen.js
-│   │   └── AccountScreen.js
+│   │   ├── AchievementsScreen.js
+│   │   ├── NotificationSettingsScreen.js
+│   │   └── OnboardingScreen.js
+│   ├── services/
+│   │   └── NotificationService.js
 │   ├── store/
 │   │   └── useStore.js
 │   ├── styles/
+│   │   └── theme.js
 │   └── utils/
+│       └── achievements.js
 └── package.json
 ```
 
@@ -250,5 +272,5 @@ detectogether-app/
 - The app follows the specification document closely
 - Vista system is implemented as a reusable component
 - Each health module follows a consistent structure
-- Gamification hooks are in place in the store
-- Ready for UI polish and animation enhancements
+- Gamification and notifications are integrated in the store
+- Ready for UI polish, charts, and animation enhancements
