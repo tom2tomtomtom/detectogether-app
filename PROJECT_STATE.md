@@ -9,7 +9,7 @@
 ## Tech Stack
 - Frontend: React Native with Expo
 - State Management: Zustand
-- Navigation: React Navigation (Bottom Tabs - Redesigned to 4 tabs)
+- Navigation: React Navigation (Persistent 4-tab system with per-tab stacks)
 - UI Components: Custom components with React Native Vector Icons
 - Styling: Global Theme System (theme.js) with consistent design tokens
 - Storage: AsyncStorage for persistence
@@ -26,6 +26,7 @@
 - Session 7: Achievements system (badges, screen, store)
 - Session 8: Expo notifications (service, settings, smart scheduling)
 - Session 9: Major UI Redesign - Modern theme, simplified navigation, beautiful cards
+- Session 10: Persistent 4-tab navigation, Track stack holds health modules, FAB wired, nested nav fixes
 - Last Updated: 2025-08-13 (Evening)
 
 ## Progress Tracking
@@ -50,7 +51,7 @@
 - [ ] Deployment
 
 ## Current Features Implemented
-1. **Navigation**: Simplified 4-tab navigation (Home, Track, Stats, Profile) with modern custom tab bar
+1. **Navigation**: Persistent 4-tab navigation (Home, Track, Stats, Profile) with per-tab stacks and custom tab bar
 2. **Vista System**: Dynamic gradient backgrounds that change based on health status
 3. **State Management**: Zustand store with user, pet, health logs, achievements, notifications
 4. **All Health Modules Complete**:
@@ -94,7 +95,7 @@
    - Auth + cloud sync (Supabase/Firebase), push token storage
 5. Pet & UX polish
    - More pet moods (sleeping/idle), richer visuals than emojis
-   - Unify Notification Settings under Account stack
+   - Polish custom tab bar and FAB accessibility
 6. Testing & analytics
    - Unit/integration/E2E; Sentry + analytics
 
@@ -239,55 +240,6 @@
 
 ## Known Issues
 - Pet visuals are emoji placeholders; richer art desired
-- FAB (Floating Action Button) defined but not mounted yet
 - Camera functionality not implemented - PHASE 3
 - No backend connection - PHASE 4
 - Trends/visualizations pending - PHASE 3
-- Need to fix onboarding selector (temporary bypass active)
-
-## File Structure
-```
-detectogether-app/
-├── App.js
-├── src/
-│   ├── components/
-│   │   ├── Vista.js
-│   │   ├── PetCharacter.js
-│   │   ├── AchievementBadge.js
-│   │   ├── MoodSelector.js
-│   │   ├── CustomTabBar.js (planned)
-│   │   ├── Button.js
-│   │   ├── Card.js
-│   │   └── Modal.js
-│   ├── navigation/
-│   │   └── MainTabNavigator.js
-│   ├── screens/
-│   │   ├── HomeScreen.js (redesigned)
-│   │   ├── TrackingHubScreen.js (new)
-│   │   ├── StatsScreen.js (new)
-│   │   ├── FluidFlowScreen.js
-│   │   ├── VitalityScreen.js
-│   │   ├── GutScreen.js
-│   │   ├── MindRadarScreen.js
-│   │   ├── DermalMapScreen.js
-│   │   ├── AccountScreen.js
-│   │   ├── AchievementsScreen.js
-│   │   ├── NotificationSettingsScreen.js
-│   │   └── OnboardingScreen.js
-│   ├── services/
-│   │   └── NotificationService.js
-│   ├── store/
-│   │   └── useStore.js
-│   ├── styles/
-│   │   └── theme.js
-│   └── utils/
-│       └── achievements.js
-└── package.json
-```
-
-## Development Notes
-- The app follows the specification document closely
-- Vista system is implemented as a reusable component
-- Each health module follows a consistent structure
-- Gamification and notifications are integrated in the store
-- Ready for UI polish, charts, and animation enhancements
