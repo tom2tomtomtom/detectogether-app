@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, shadows } from '../styles/theme';
@@ -11,8 +12,16 @@ import HomeScreen from '../screens/HomeScreen';
 import TrackingHubScreen from '../screens/TrackingHubScreen';
 import StatsScreen from '../screens/StatsScreen';
 import AccountScreen from '../screens/AccountScreen';
+import FluidFlowScreen from '../screens/FluidFlowScreen';
+import VitalityScreen from '../screens/VitalityScreen';
+import GutScreen from '../screens/GutScreen';
+import MindRadarScreen from '../screens/MindRadarScreen';
+import DermalMapScreen from '../screens/DermalMapScreen';
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 // Custom tab bar component
 const CustomTabBar = ({ state, descriptors, navigation }) => {
@@ -64,7 +73,7 @@ const FabOverlay = () => {
   return <QuickLogFAB navigation={navigation} />;
 };
 
-const MainTabNavigator = () => {
+const TabNavigator = () => {
   return (
     <View style={{ flex: 1 }}>
       <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
@@ -75,6 +84,23 @@ const MainTabNavigator = () => {
       </Tab.Navigator>
       <FabOverlay />
     </View>
+  );
+};
+
+const MainStack = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="TabNavigator" component={TabNavigator} />
+      {/* Health Module Screens */}
+      <Stack.Screen name="FluidFlow" component={FluidFlowScreen} />
+      <Stack.Screen name="Vitality" component={VitalityScreen} />
+      <Stack.Screen name="Gut" component={GutScreen} />
+      <Stack.Screen name="MindRadar" component={MindRadarScreen} />
+      <Stack.Screen name="DermalMap" component={DermalMapScreen} />
+      {/* Other screens */}
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+    </Stack.Navigator>
   );
 };
 
@@ -120,4 +146,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MainTabNavigator;
+export default MainStack;

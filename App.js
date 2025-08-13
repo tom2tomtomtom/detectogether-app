@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import MainTabNavigator from './src/navigation/MainTabNavigator';
+import MainStack from './src/navigation/MainTabNavigator';
 import { useStore } from './src/store/useStore';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { View } from 'react-native';
@@ -41,7 +41,7 @@ export default function App() {
       <NavigationContainer ref={navRef}>
         <StatusBar style="auto" />
         {onboardingComplete ? (
-          <MainTabNavigator />
+          <MainStack />
         ) : (
           <OnboardingScreen />
         )}
