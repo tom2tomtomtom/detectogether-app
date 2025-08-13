@@ -171,7 +171,7 @@ const useStore = create((set, get) => ({
       // Check for level up
       if (pet.careCredits >= pet.level * 100) {
         pet.level += 1;
-        pet.environment = get().getNextEnvironment(pet.level);
+        // Removed call to getNextEnvironment which does not exist
       }
       
       return { pet };
