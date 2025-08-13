@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -12,6 +12,7 @@ import { registerForPushNotificationsAsync } from './src/services/NotificationSe
 export default function App() {
   const initializeApp = useStore((state) => state.initializeApp);
   const onboardingComplete = useStore((state) => state.user?.onboardingComplete || false);
+  const navRef = useRef(null);
 
   useEffect(() => {
     initializeApp();
@@ -37,7 +38,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navRef}>
         <StatusBar style="auto" />
         {onboardingComplete ? (
           <MainTabNavigator />

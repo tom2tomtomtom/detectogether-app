@@ -1,117 +1,116 @@
 import React from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, borderRadius } from '../styles/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, shadows } from '../styles/theme';
 
 // Import screens
 import HomeScreen from '../screens/HomeScreen';
-import FluidFlowScreen from '../screens/FluidFlowScreen';
-import VitalityScreen from '../screens/VitalityScreen';
-import GutScreen from '../screens/GutScreen';
-import MindRadarScreen from '../screens/MindRadarScreen';
-import DermalMapScreen from '../screens/DermalMapScreen';
+import TrackingHubScreen from '../screens/TrackingHubScreen';
+import StatsScreen from '../screens/StatsScreen';
 import AccountScreen from '../screens/AccountScreen';
-import AchievementsScreen from '../screens/AchievementsScreen';
-import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 
 const Tab = createBottomTabNavigator();
 
-const tabIcons = {
-  Home: 'home',
-  FluidFlow: 'water',
-  Vitality: 'flash',
-  Gut: 'nutrition',
-  MindRadar: 'eye',
-  DermalMap: 'body',
-  Achievements: 'trophy',
-  Notifications: 'notifications',
-  Account: 'person',
+// Custom tab bar component
+const CustomTabBar = ({ state, descriptors, navigation }) => {
+  const iconMap = {
+    Home: 'home',
+    Track: 'fitness',
+    Stats: 'stats-chart',
+    Profile: 'person',
+  };
+  return (
+    <View style={styles.tabBar}>
+      {state.routes.map((route, index) => {
+        const isFocused = state.index === index;
+        const onPress = () => {
+          if (!isFocused) navigation.navigate(route.name);
+        };
+        return (
+          <TouchableOpacity key={route.key} onPress={onPress} style={styles.tab}>
+            <Icon
+              name={iconMap[route.name]}
+              size={24}
+              color={isFocused ? colors.primary : colors.textSecondary}
+            />
+            {isFocused && <View style={styles.activeIndicator} />}
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 };
 
-function MainTabNavigator() {
+// Floating Action Button component
+const QuickLogFAB = ({ navigation }) => {
   return (
-    <Tab.Navigator
-      safeAreaInsets={{ bottom: 8 }}
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color }) => {
-          const iconName = tabIcons[route.name] || 'help-circle';
-          return <Icon name={iconName} size={22} color={color} />;
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textLight,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabBarLabel,
-        tabBarItemStyle: styles.tabBarItem,
-        tabBarActiveBackgroundColor: colors.primaryLight,
-        headerShown: false,
-      })}
-    ><Tab.Screen 
-        name="Home" 
-        component={HomeScreen}
-        options={{ tabBarLabel: 'Home' }}
-      />
-      <Tab.Screen 
-        name="FluidFlow" 
-        component={FluidFlowScreen}
-        options={{ tabBarLabel: 'Fluid Flow' }}
-      />
-      <Tab.Screen 
-        name="Vitality" 
-        component={VitalityScreen}
-        options={{ tabBarLabel: 'Vitality' }}
-      />
-      <Tab.Screen 
-        name="Gut" 
-        component={GutScreen}
-        options={{ tabBarLabel: 'Gut' }}
-      />
-      <Tab.Screen 
-        name="MindRadar" 
-        component={MindRadarScreen}
-        options={{ tabBarLabel: "Mind's Radar" }}
-      />
-      <Tab.Screen 
-        name="DermalMap" 
-        component={DermalMapScreen}
-        options={{ tabBarLabel: 'Dermal Map' }}
-      />
-      <Tab.Screen 
-        name="Achievements" 
-        component={AchievementsScreen}
-        options={{ tabBarLabel: 'Achievements' }}
-      />
-      <Tab.Screen 
-        name="Notifications" 
-        component={NotificationSettingsScreen}
-        options={{ tabBarLabel: 'Notifications' }}
-      />
-      <Tab.Screen 
-        name="Account" 
-        component={AccountScreen}
-        options={{ tabBarLabel: 'Account' }}
-      /></Tab.Navigator>
+    <TouchableOpacity
+      style={styles.fab}
+      onPress={() => navigation.navigate('Track')}
+      activeOpacity={0.9}
+    >
+      <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.fabGradient}>
+        <Icon name="add" size={28} color={colors.textWhite} />
+      </LinearGradient>
+    </TouchableOpacity>
   );
-}
+};
+
+const MainTabNavigator = () => {
+  return (
+    <View style={{ flex: 1 }}>
+      <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Track" component={TrackingHubScreen} />
+        <Tab.Screen name="Stats" component={StatsScreen} />
+        <Tab.Screen name="Profile" component={AccountScreen} />
+      </Tab.Navigator>
+      {/* FAB needs access to navigation - create a simple hook wrapper */}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   tabBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
     backgroundColor: colors.surface,
+    paddingBottom: 34,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    paddingTop: 8,
-    paddingBottom: 20,
-    height: 85,
-    elevation: 0,
-    shadowOpacity: 0,
+    ...shadows.md,
   },
-  tabBarItem: {
-    marginHorizontal: 6,
-    borderRadius: 16,
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
   },
-  tabBarLabel: {
-    fontSize: 10,
-    marginBottom: 3,
+  activeIndicator: {
+    position: 'absolute',
+    bottom: -12,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 80,
+    alignSelf: 'center',
+    ...shadows.lg,
+  },
+  fabGradient: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
