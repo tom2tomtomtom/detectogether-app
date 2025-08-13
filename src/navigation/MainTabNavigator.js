@@ -5,9 +5,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, shadows } from '../styles/theme';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
-// Import screens
+// Screens
 import HomeScreen from '../screens/HomeScreen';
 import TrackingHubScreen from '../screens/TrackingHubScreen';
 import StatsScreen from '../screens/StatsScreen';
@@ -18,34 +18,25 @@ import GutScreen from '../screens/GutScreen';
 import MindRadarScreen from '../screens/MindRadarScreen';
 import DermalMapScreen from '../screens/DermalMapScreen';
 import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
-import OnboardingScreen from '../screens/OnboardingScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const HomeStack = createStackNavigator();
+const TrackStack = createStackNavigator();
+const StatsStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 
-// Custom tab bar component
+// Tab Bar
 const CustomTabBar = ({ state, descriptors, navigation }) => {
-  const iconMap = {
-    Home: 'home',
-    Track: 'fitness',
-    Stats: 'stats-chart',
-    Profile: 'person',
-  };
+  const iconMap = { Home: 'home', Track: 'fitness', Stats: 'stats-chart', Profile: 'person' };
   return (
     <View style={styles.tabBar}>
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
-        const onPress = () => {
-          if (!isFocused) navigation.navigate(route.name);
-        };
+        const onPress = () => !isFocused && navigation.navigate(route.name);
         return (
           <TouchableOpacity key={route.key} onPress={onPress} style={styles.tab}>
-            <Icon
-              name={iconMap[route.name]}
-              size={24}
-              color={isFocused ? colors.primary : colors.textSecondary}
-            />
+            <Icon name={iconMap[route.name]} size={24} color={isFocused ? colors.primary : colors.textSecondary} />
             {isFocused && <View style={styles.activeIndicator} />}
           </TouchableOpacity>
         );
@@ -54,14 +45,11 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   );
 };
 
-// Floating Action Button component
-const QuickLogFAB = ({ navigation }) => {
+// FAB
+const QuickLogFAB = () => {
+  const navigation = useNavigation();
   return (
-    <TouchableOpacity
-      style={styles.fab}
-      onPress={() => navigation.navigate('TabNavigator', { screen: 'Track' })}
-      activeOpacity={0.9}
-    >
+    <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('Track')} activeOpacity={0.9}>
       <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.fabGradient}>
         <Icon name="add" size={28} color={colors.textWhite} />
       </LinearGradient>
@@ -69,53 +57,56 @@ const QuickLogFAB = ({ navigation }) => {
   );
 };
 
-const FabOverlay = () => {
-  const navigation = useNavigation();
-  return <QuickLogFAB navigation={navigation} />;
-};
+// Stacks
+const HomeStackScreen = () => (
+  <HomeStack.Navigator screenOptions={{ headerShown: false }}>
+    <HomeStack.Screen name="HomeScreen" component={HomeScreen} />
+  </HomeStack.Navigator>
+);
 
-const TabNavigator = () => {
+const TrackStackScreen = () => (
+  <TrackStack.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: colors.background, elevation: 0, shadowOpacity: 0 },
+      headerTintColor: colors.primary,
+      headerTitleStyle: { fontWeight: '600' },
+    }}
+  >
+    <TrackStack.Screen name="TrackingHub" component={TrackingHubScreen} options={{ headerShown: false }} />
+    <TrackStack.Screen name="FluidFlow" component={FluidFlowScreen} options={{ title: 'Fluid Flow & Balance' }} />
+    <TrackStack.Screen name="Vitality" component={VitalityScreen} options={{ title: 'Vitality Compass' }} />
+    <TrackStack.Screen name="Gut" component={GutScreen} options={{ title: 'Gut Intelligence' }} />
+    <TrackStack.Screen name="MindRadar" component={MindRadarScreen} options={{ title: "Mind's Radar" }} />
+    <TrackStack.Screen name="DermalMap" component={DermalMapScreen} options={{ title: 'Dermal Map' }} />
+  </TrackStack.Navigator>
+);
+
+const StatsStackScreen = () => (
+  <StatsStack.Navigator screenOptions={{ headerShown: false }}>
+    <StatsStack.Screen name="StatsScreen" component={StatsScreen} />
+    <StatsStack.Screen name="Achievements" component={AchievementsScreen} options={{ headerShown: true, title: 'Achievements' }} />
+  </StatsStack.Navigator>
+);
+
+const ProfileStackScreen = () => (
+  <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+    <ProfileStack.Screen name="ProfileScreen" component={AccountScreen} />
+    <ProfileStack.Screen name="NotificationSettings" component={NotificationSettingsScreen} options={{ headerShown: true, title: 'Notification Settings' }} />
+  </ProfileStack.Navigator>
+);
+
+// Tabs persistent
+const MainTabNavigator = () => {
   return (
     <View style={{ flex: 1 }}>
       <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Track" component={TrackingHubScreen} />
-        <Tab.Screen name="Stats" component={StatsScreen} />
-        <Tab.Screen name="Profile" component={AccountScreen} />
+        <Tab.Screen name="Home" component={HomeStackScreen} />
+        <Tab.Screen name="Track" component={TrackStackScreen} />
+        <Tab.Screen name="Stats" component={StatsStackScreen} />
+        <Tab.Screen name="Profile" component={ProfileStackScreen} />
       </Tab.Navigator>
-      <FabOverlay />
+      <QuickLogFAB />
     </View>
-  );
-};
-
-const moduleHeaderOptions = (title) => ({
-  headerShown: true,
-  headerTitle: title,
-  headerStyle: {
-    backgroundColor: colors.background,
-    elevation: 0,
-    shadowOpacity: 0,
-    borderBottomWidth: 0,
-  },
-  headerTintColor: colors.primary,
-  headerTitleStyle: { fontWeight: '600', fontSize: 18 },
-});
-
-const MainStack = () => {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false, presentation: 'card' }}>
-      <Stack.Screen name="TabNavigator" component={TabNavigator} />
-      {/* Health Module Screens with Headers */}
-      <Stack.Screen name="FluidFlow" component={FluidFlowScreen} options={moduleHeaderOptions('Fluid Flow & Balance')} />
-      <Stack.Screen name="Vitality" component={VitalityScreen} options={moduleHeaderOptions('Vitality Compass')} />
-      <Stack.Screen name="Gut" component={GutScreen} options={moduleHeaderOptions('Gut Intelligence')} />
-      <Stack.Screen name="MindRadar" component={MindRadarScreen} options={moduleHeaderOptions("Mind's Radar")} />
-      <Stack.Screen name="DermalMap" component={DermalMapScreen} options={moduleHeaderOptions('Dermal Map')} />
-      {/* Other screens */}
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
-      <Stack.Screen name="Achievements" component={AchievementsScreen} />
-    </Stack.Navigator>
   );
 };
 
@@ -133,32 +124,10 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
     ...shadows.md,
   },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  activeIndicator: {
-    position: 'absolute',
-    bottom: -12,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.primary,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 80,
-    alignSelf: 'center',
-    ...shadows.lg,
-  },
-  fabGradient: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  tab: { flex: 1, alignItems: 'center', paddingVertical: 8 },
+  activeIndicator: { position: 'absolute', bottom: -12, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary },
+  fab: { position: 'absolute', bottom: 80, alignSelf: 'center', ...shadows.lg },
+  fabGradient: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
 });
 
-export default MainStack;
+export default MainTabNavigator;

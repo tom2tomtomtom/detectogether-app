@@ -87,10 +87,11 @@ const TrackingHubScreen = () => {
             <TouchableOpacity
               key={module.id}
               style={styles.moduleCard}
-              onPress={() => navigation.navigate(module.route)}
+              onPress={() => navigation.navigate('Track', { screen: module.route })}
               activeOpacity={0.9}
             >
-              <View style={[styles.iconContainer, { backgroundColor: module.lightColor }]}>                <Icon name={module.icon} size={28} color={module.color} />
+              <View style={[styles.iconContainer, { backgroundColor: module.lightColor }]}>
+                <Icon name={module.icon} size={28} color={module.color} />
               </View>
               <View style={styles.moduleContent}>
                 <Text style={styles.moduleTitle}>{module.title}</Text>
