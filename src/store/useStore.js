@@ -267,6 +267,15 @@ const useStore = create((set, get) => ({
     get().saveData();
   },
 
+  clearAchievementToast: () => {
+    set((state) => ({
+      achievements: {
+        ...state.achievements,
+        toasts: (state.achievements.toasts || []).slice(1)
+      }
+    }));
+  },
+
   checkAchievements: (loggedModule) => {
     const state = get();
     const now = new Date();

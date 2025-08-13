@@ -16,8 +16,8 @@ const HomeScreen = ({ navigation }) => {
   const user = useStore((state) => state.user);
   const pet = useStore((state) => state.pet);
   const healthLogs = useStore((state) => state.healthLogs);
-  const achievements = useStore((s) => s.achievements);
-  const setAchievements = useStore((set) => (payload) => set((state) => ({ achievements: { ...state.achievements, ...payload } })));
+  const achievements = useStore((state) => state.achievements);
+  const clearAchievementToast = useStore((state) => state.clearAchievementToast);
 
   const routes = {
     hydration: { route: 'FluidFlow', title: 'Hydration', icon: 'water', color: '#3B82F6' },
@@ -123,7 +123,7 @@ const HomeScreen = ({ navigation }) => {
   const unlockedTitle = toastId ? (require('../utils/achievements').ALL_ACHIEVEMENTS.find((a) => a.id === toastId)?.title || 'Achievement') : '';
 
   const clearToast = () => {
-    setAchievements({ toasts: (achievements.toasts || []).slice(1) });
+    clearAchievementToast();
   };
 
   return (

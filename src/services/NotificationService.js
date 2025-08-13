@@ -14,24 +14,41 @@ Notifications.setNotificationHandler({
 
 export async function registerForPushNotificationsAsync() {
   let token;
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.DEFAULT,
-    });
-  }
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
+  
+  try {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.DEFAULT,
+      });
     }
-    if (finalStatus !== 'granted') {
+    
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        console.log('Push notification permissions not granted');
+        return null;
+      }
+      
+      // Safer token retrieval
+      try {
+        const tokenData = await Notifications.getExpoPushTokenAsync();
+        token = tokenData.data;
+      } catch (e) {
+        console.log('Error getting push token:', e);
+        return null;
+      }
+    } else {
+      console.log('Must use physical device for push notifications');
       return null;
     }
-    token = (await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig?.extra?.eas?.projectId || Constants.expoConfig?.owner })).data;
-  } else {
+  } catch (error) {
+    console.error('Error registering for push notifications:', error);
     return null;
   }
 
