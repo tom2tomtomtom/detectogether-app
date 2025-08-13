@@ -58,7 +58,7 @@ const QuickLogFAB = ({ navigation }) => {
   return (
     <TouchableOpacity
       style={styles.fab}
-      onPress={() => navigation.navigate('Track')}
+      onPress={() => navigation.navigate('TabNavigator', { screen: 'Track' })}
       activeOpacity={0.9}
     >
       <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.fabGradient}>
