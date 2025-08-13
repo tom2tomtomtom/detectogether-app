@@ -12,6 +12,7 @@ import MindRadarScreen from '../screens/MindRadarScreen';
 import DermalMapScreen from '../screens/DermalMapScreen';
 import AccountScreen from '../screens/AccountScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,6 +24,7 @@ const tabIcons = {
   MindRadar: 'eye',
   DermalMap: 'body',
   Achievements: 'trophy',
+  Notifications: 'notifications',
   Account: 'person',
 };
 
@@ -74,6 +76,11 @@ function MainTabNavigator() {
         name="Achievements" 
         component={AchievementsScreen}
         options={{ tabBarLabel: 'Achievements' }}
+      />
+      <Tab.Screen 
+        name="Notifications" 
+        component={NotificationSettingsScreen}
+        options={{ tabBarLabel: 'Notifications' }}
       />
       <Tab.Screen 
         name="Account" 

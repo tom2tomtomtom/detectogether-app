@@ -11,6 +11,17 @@ const useStore = create((set, get) => ({
     onboardingComplete: false,
   },
   
+  // Notification preferences
+  notifications: {
+    enabled: true,
+    morningCheckIn: { enabled: true, time: '08:00' },
+    hydration: { enabled: true, frequencyHours: 2 },
+    modules: { hydration: true, energy: true, gut: true, headVision: true, skin: true },
+    achievements: { enabled: true },
+    streaks: { enabled: true },
+    lastNotificationTime: null,
+  },
+  
   // Pet State
   pet: {
     happiness: 50,
@@ -62,6 +73,7 @@ const useStore = create((set, get) => ({
           pet: { ...state.pet, ...parsedData.pet },
           healthLogs: { ...state.healthLogs, ...parsedData.healthLogs },
           achievements: { ...state.achievements, ...(parsedData.achievements || {}) },
+          notifications: { ...state.notifications, ...(parsedData.notifications || {}) },
         }));
       }
     } catch (error) {
@@ -73,6 +85,21 @@ const useStore = create((set, get) => ({
     set((state) => ({
       user: { ...state.user, ...userData },
     }));
+    get().saveData();
+  },
+
+  setNotificationPreference: (path, value) => {
+    set((state) => {
+      const next = { ...state.notifications };
+      const parts = path.split('.');
+      let cursor = next;
+      for (let i = 0; i < parts.length - 1; i++) {
+        cursor[parts[i]] = { ...cursor[parts[i]] };
+        cursor = cursor[parts[i]];
+      }
+      cursor[parts[parts.length - 1]] = value;
+      return { notifications: next };
+    });
     get().saveData();
   },
   
@@ -287,7 +314,7 @@ const useStore = create((set, get) => ({
       if (streakDays >= sDef.target) get().unlockAchievement(sDef.id);
     });
 
-    // Balance: check whether all modules have a positive log today and statuses are in green/good
+    // Balance: all modules logged today
     const allToday = MODULE_KEYS.every((k) => (state.healthLogs[k] || []).some((l) => new Date(l.timestamp).toDateString() === now.toDateString()));
     if (allToday) {
       // increment balanced days if new day
@@ -326,6 +353,7 @@ const useStore = create((set, get) => ({
         pet: state.pet,
         healthLogs: state.healthLogs,
         achievements: state.achievements,
+        notifications: state.notifications,
       };
       await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
     } catch (error) {

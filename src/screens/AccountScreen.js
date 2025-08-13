@@ -3,11 +3,12 @@ import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-na
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const AccountScreen = () => {
+const AccountScreen = ({ navigation }) => {
   const user = useStore((state) => state.user);
   const pet = useStore((state) => state.pet);
 
   const settingsOptions = [
+    { icon: 'notifications', label: 'Notification Settings', onPress: () => navigation && navigation.navigate && navigation.navigate('NotificationSettings') },
     { icon: 'person', label: 'Personal Information', onPress: () => {} },
     { icon: 'paw', label: 'Pet Information', onPress: () => {} },
     { icon: 'lock-closed', label: 'Privacy & Data', onPress: () => {} },

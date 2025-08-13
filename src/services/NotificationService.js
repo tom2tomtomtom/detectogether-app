@@ -1,0 +1,92 @@
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
+import { useStore } from '../store/useStore';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+export async function registerForPushNotificationsAsync() {
+  let token;
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      return null;
+    }
+    token = (await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig?.extra?.eas?.projectId || Constants.expoConfig?.owner })).data;
+  } else {
+    return null;
+  }
+
+  return token;
+}
+
+export function isQuietHours(now = new Date()) {
+  const hour = now.getHours();
+  return hour >= 22 || hour < 7;
+}
+
+export function hasRecentActivity(healthLogs, minutes = 45) {
+  const cutoff = Date.now() - minutes * 60000;
+  return Object.values(healthLogs || {}).some((arr) => (arr || []).some((l) => new Date(l.timestamp).getTime() >= cutoff));
+}
+
+export async function scheduleMorningCheckIn(time = '08:00') {
+  const [h, m] = time.split(':').map((x) => parseInt(x, 10));
+  await Notifications.scheduleNotificationAsync({
+    content: { title: 'Good morning!', body: 'How are you feeling today?' },
+    trigger: { hour: h, minute: m, repeats: true },
+  });
+}
+
+export async function scheduleHydrationReminders() {
+  // 9am to 7pm every 2 hours
+  for (let hour = 9; hour <= 19; hour += 2) {
+    await Notifications.scheduleNotificationAsync({
+      content: { title: 'Time for a water break! 💧' },
+      trigger: { hour, minute: 0, repeats: true },
+    });
+  }
+}
+
+export async function sendInstantAchievement(title) {
+  await Notifications.scheduleNotificationAsync({
+    content: { title: 'Achievement unlocked!', body: title },
+    trigger: null,
+  });
+}
+
+export async function maybeSendSmartNotification({ type, store }) {
+  const state = store.getState();
+  const { notifications } = state;
+  if (!notifications?.enabled) return;
+  if (isQuietHours()) return;
+  if (hasRecentActivity(state.healthLogs)) return;
+
+  const contentByType = {
+    morning: { title: 'Good morning!', body: 'How are you feeling today?' },
+    hydration: { title: 'Time for a water break! 💧' },
+    streak: { title: `Keep your ${state.achievements?.streakDays || 0}-day streak going!` },
+  };
+  const content = contentByType[type];
+  if (!content) return;
+
+  await Notifications.scheduleNotificationAsync({ content, trigger: null });
+}

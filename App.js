@@ -6,6 +6,8 @@ import MainTabNavigator from './src/navigation/MainTabNavigator';
 import { useStore } from './src/store/useStore';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import { View } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import { registerForPushNotificationsAsync } from './src/services/NotificationService';
 
 export default function App() {
   const initializeApp = useStore((state) => state.initializeApp);
@@ -14,6 +16,20 @@ export default function App() {
   useEffect(() => {
     initializeApp();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (onboardingComplete) {
+        await registerForPushNotificationsAsync();
+      }
+    })();
+
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      // Could navigate based on response.notification.request.content.data
+      // Placeholder: no-op for now
+    });
+    return () => sub.remove();
+  }, [onboardingComplete]);
 
   return (
     <SafeAreaProvider>
