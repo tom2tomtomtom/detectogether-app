@@ -11,6 +11,7 @@ import GutScreen from '../screens/GutScreen';
 import MindRadarScreen from '../screens/MindRadarScreen';
 import DermalMapScreen from '../screens/DermalMapScreen';
 import AccountScreen from '../screens/AccountScreen';
+import AchievementsScreen from '../screens/AchievementsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +22,7 @@ const tabIcons = {
   Gut: 'nutrition',
   MindRadar: 'eye',
   DermalMap: 'body',
+  Achievements: 'trophy',
   Account: 'person',
 };
 
@@ -67,6 +69,11 @@ function MainTabNavigator() {
         name="DermalMap" 
         component={DermalMapScreen}
         options={{ tabBarLabel: 'Dermal Map' }}
+      />
+      <Tab.Screen 
+        name="Achievements" 
+        component={AchievementsScreen}
+        options={{ tabBarLabel: 'Achievements' }}
       />
       <Tab.Screen 
         name="Account" 

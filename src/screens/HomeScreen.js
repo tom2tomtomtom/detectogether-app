@@ -5,7 +5,8 @@ import {
   StyleSheet, 
   ScrollView, 
   TouchableOpacity,
-  SafeAreaView 
+  SafeAreaView,
+  Modal 
 } from 'react-native';
 import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
@@ -15,6 +16,8 @@ const HomeScreen = ({ navigation }) => {
   const user = useStore((state) => state.user);
   const pet = useStore((state) => state.pet);
   const healthLogs = useStore((state) => state.healthLogs);
+  const achievements = useStore((s) => s.achievements);
+  const setAchievements = useStore((set) => (payload) => set((state) => ({ achievements: { ...state.achievements, ...payload } })));
 
   const routes = {
     hydration: { route: 'FluidFlow', title: 'Hydration', icon: 'water', color: '#3B82F6' },
@@ -115,6 +118,14 @@ const HomeScreen = ({ navigation }) => {
 
   const overallHealthScore = Math.round((pet.health + pet.energy + pet.happiness) / 3);
 
+  const toastId = achievements?.toasts?.[0];
+  const unlockedMap = Object.fromEntries((achievements?.unlockedIds || []).map((id) => [id, true]));
+  const unlockedTitle = toastId ? (require('../utils/achievements').ALL_ACHIEVEMENTS.find((a) => a.id === toastId)?.title || 'Achievement') : '';
+
+  const clearToast = () => {
+    setAchievements({ toasts: (achievements.toasts || []).slice(1) });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Vista tabName="home" healthScore={overallHealthScore} />
@@ -207,6 +218,21 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
+
+      {/* Achievement Modal */}
+      <Modal visible={!!toastId} transparent animationType="fade" onRequestClose={clearToast}>
+        <View style={styles.toastOverlay}>
+          <View style={styles.toastCard}>
+            <Text style={styles.toastEmoji}>🎉✨🎊</Text>
+            <Text style={styles.toastTitle}>Achievement Unlocked!</Text>
+            <Text style={styles.toastSubtitle}>{unlockedTitle}</Text>
+            <TouchableOpacity style={[styles.quickActionButton, { borderColor: '#F59E0B', backgroundColor: '#F59E0B15', paddingHorizontal: 20 }]} onPress={clearToast}>
+              <Icon name="trophy" size={20} color="#F59E0B" />
+              <Text style={[styles.quickActionText, { color: '#F59E0B' }]}>Nice!</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -392,6 +418,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 6,
+  },
+  toastOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  toastCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  toastEmoji: {
+    fontSize: 28,
+    marginBottom: 10,
+  },
+  toastTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F2937',
+  },
+  toastSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginBottom: 12,
   },
 });
 

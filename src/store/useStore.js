@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ACHIEVEMENTS, ALL_ACHIEVEMENTS, MODULE_KEYS } from '../utils/achievements';
 
 const useStore = create((set, get) => ({
   // User State
@@ -28,6 +29,18 @@ const useStore = create((set, get) => ({
     headVision: [],
     skin: [],
   },
+
+  // Achievements state
+  achievements: {
+    unlockedIds: [],
+    progress: {},
+    streakDays: 0,
+    lastLogDate: null,
+    moduleCounts: MODULE_KEYS.reduce((acc, k) => ({ ...acc, [k]: 0 }), {}),
+    balancedDays: 0,
+    lastBalancedDate: null,
+    toasts: [],
+  },
   
   // Vista States for each tab
   vistaStates: {
@@ -48,6 +61,7 @@ const useStore = create((set, get) => ({
           user: { ...state.user, ...parsedData.user },
           pet: { ...state.pet, ...parsedData.pet },
           healthLogs: { ...state.healthLogs, ...parsedData.healthLogs },
+          achievements: { ...state.achievements, ...(parsedData.achievements || {}) },
         }));
       }
     } catch (error) {
@@ -99,6 +113,7 @@ const useStore = create((set, get) => ({
     }));
     get().updatePetStatus(type);
     get().updateVistaState(type);
+    get().checkAchievements(type);
     get().saveData();
   },  
   updatePetStatus: (actionType) => {
@@ -215,15 +230,92 @@ const useStore = create((set, get) => ({
       return { vistaStates };
     });
   },  
-  getNextEnvironment: (level) => {
-    const environments = [
-      'starter_room',
-      'cozy_apartment',
-      'garden_yard',
-      'park_space',
-      'dream_home',
-    ];
-    return environments[Math.min(level - 1, environments.length - 1)];
+
+  unlockAchievement: (id) => {
+    set((state) => {
+      if (state.achievements.unlockedIds.includes(id)) return {};
+      const unlockedIds = [...state.achievements.unlockedIds, id];
+      return { achievements: { ...state.achievements, unlockedIds, toasts: [...(state.achievements.toasts || []), id] } };
+    });
+    get().saveData();
+  },
+
+  checkAchievements: (loggedModule) => {
+    const state = get();
+    const now = new Date();
+    const todayKey = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+
+    // Streaks
+    set((s) => {
+      const last = s.achievements.lastLogDate ? new Date(s.achievements.lastLogDate) : null;
+      let streakDays = s.achievements.streakDays || 0;
+      if (!last) {
+        streakDays = 1;
+      } else {
+        const diffDays = Math.floor((now - new Date(last.getFullYear(), last.getMonth(), last.getDate())) / 86400000);
+        if (diffDays === 0) {
+          // same day
+        } else if (diffDays === 1) {
+          streakDays += 1;
+        } else if (diffDays > 1) {
+          streakDays = 1;
+        }
+      }
+      return { achievements: { ...s.achievements, lastLogDate: todayKey, streakDays } };
+    });
+
+    // Module counts + mastery unlocks
+    set((s) => {
+      const counts = { ...s.achievements.moduleCounts };
+      counts[loggedModule] = (counts[loggedModule] || 0) + 1;
+      return { achievements: { ...s.achievements, moduleCounts: counts } };
+    });
+    const counts = get().achievements.moduleCounts;
+    ACHIEVEMENTS.mastery
+      .filter((m) => m.module === loggedModule)
+      .forEach((m) => {
+        if (counts[loggedModule] >= m.target) get().unlockAchievement(m.id);
+        const prog = Math.min(1, (counts[loggedModule] || 0) / m.target);
+        set((s) => ({ achievements: { ...s.achievements, progress: { ...s.achievements.progress, [m.id]: prog } } }));
+      });
+
+    // Streak thresholds
+    const streakDays = get().achievements.streakDays;
+    ACHIEVEMENTS.streaks.forEach((sDef) => {
+      const prog = Math.min(1, streakDays / sDef.target);
+      set((s) => ({ achievements: { ...s.achievements, progress: { ...s.achievements.progress, [sDef.id]: prog } } }));
+      if (streakDays >= sDef.target) get().unlockAchievement(sDef.id);
+    });
+
+    // Balance: check whether all modules have a positive log today and statuses are in green/good
+    const allToday = MODULE_KEYS.every((k) => (state.healthLogs[k] || []).some((l) => new Date(l.timestamp).toDateString() === now.toDateString()));
+    if (allToday) {
+      // increment balanced days if new day
+      set((s) => {
+        const lastBal = s.achievements.lastBalancedDate ? new Date(s.achievements.lastBalancedDate) : null;
+        let balancedDays = s.achievements.balancedDays || 0;
+        if (!lastBal || lastBal.toDateString() !== now.toDateString()) {
+          balancedDays += 1;
+        }
+        return { achievements: { ...s.achievements, lastBalancedDate: todayKey, balancedDays } };
+      });
+      const balancedDays = get().achievements.balancedDays;
+      ACHIEVEMENTS.balance.forEach((b) => {
+        const prog = Math.min(1, balancedDays / b.target);
+        set((s) => ({ achievements: { ...s.achievements, progress: { ...s.achievements.progress, [b.id]: prog } } }));
+        if (balancedDays >= b.target) get().unlockAchievement(b.id);
+      });
+    }
+
+    // Special time-based
+    const hour = now.getHours();
+    if (hour >= 22) get().unlockAchievement('special_night_owl');
+    if (hour < 6) get().unlockAchievement('special_early_bird');
+
+    // Explorer basics
+    const triedAll = MODULE_KEYS.every((k) => (get().achievements.moduleCounts[k] || 0) > 0);
+    if (triedAll) get().unlockAchievement('explorer_try_all');
+    if (streakDays >= 7) get().unlockAchievement('explorer_first_week');
   },
   
   saveData: async () => {
@@ -233,8 +325,9 @@ const useStore = create((set, get) => ({
         user: state.user,
         pet: state.pet,
         healthLogs: state.healthLogs,
+        achievements: state.achievements,
       };
-    await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
+      await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
     } catch (error) {
       console.error('Error saving user data:', error);
     }
