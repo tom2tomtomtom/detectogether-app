@@ -8,6 +8,7 @@ const useStore = create((set, get) => ({
     name: '',
     petType: null, // 'dog' or 'cat'
     petName: '',
+    petColor: 'default',
     onboardingComplete: false,
   },
   
@@ -109,6 +110,13 @@ const useStore = create((set, get) => ({
     }));
     get().saveData();
   },
+
+  setPetColor: (petColor) => {
+    set((state) => ({
+      user: { ...state.user, petColor },
+    }));
+    get().saveData();
+  },
   
   setPetName: (petName) => {
     set((state) => ({
@@ -171,7 +179,7 @@ const useStore = create((set, get) => ({
       // Check for level up
       if (pet.careCredits >= pet.level * 100) {
         pet.level += 1;
-        // Removed call to getNextEnvironment which does not exist
+        // environment progression can be added later
       }
       
       return { pet };
