@@ -68,6 +68,9 @@ const useStore = create((set, get) => ({
   activeMissions: [],
   completedMissions: [],
   missionProgress: {},
+  // Neighborhood (mock community)
+  neighborhoodData: [],
+  communityStats: { totalLogs: 0, activeUsers: 0, weeklyGoal: 1000, unlocked: null },
   
   // Vista States for each tab
   vistaStates: {
@@ -93,7 +96,13 @@ const useStore = create((set, get) => ({
           activeMissions: parsedData.activeMissions || state.activeMissions,
           completedMissions: parsedData.completedMissions || state.completedMissions,
           missionProgress: parsedData.missionProgress || state.missionProgress,
+          neighborhoodData: parsedData.neighborhoodData || state.neighborhoodData,
+          communityStats: parsedData.communityStats || state.communityStats,
         }));
+        // Seed neighbors if missing
+        if (!Array.isArray(get().neighborhoodData) || get().neighborhoodData.length === 0) {
+          try { get().generateMockNeighbors(); } catch (_) {}
+        }
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -169,6 +178,8 @@ const useStore = create((set, get) => ({
       const moduleBase = { hydration: 10, energy: 10, gut: 15, headVision: 10, skin: 25 };
       const amount = moduleBase[type] || 5;
       get().addCredits(amount, `log:${type}`);
+      // Update community totals
+      try { get().updateCommunityProgress(1); } catch (_) {}
       get().updateVistaState(type);
       get().checkAchievements(type);
       get().saveData();
@@ -491,6 +502,8 @@ const useStore = create((set, get) => ({
             activeMissions: state.activeMissions || [],
             completedMissions: state.completedMissions || [],
             missionProgress: state.missionProgress || {},
+        neighborhoodData: state.neighborhoodData || [],
+        communityStats: state.communityStats || { totalLogs: 0, activeUsers: 0, weeklyGoal: 1000, unlocked: null },
           };
           const jsonString = JSON.stringify(dataToSave);
           await AsyncStorage.setItem('userData', jsonString);
@@ -501,6 +514,32 @@ const useStore = create((set, get) => ({
     } catch (error) {
       console.error('SaveData wrapper error:', error);
     }
+  },
+  generateMockNeighbors: () => {
+    const petTypes = ['dog', 'cat', 'bunny', 'axolotl'];
+    const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const now = Date.now();
+    const neighbors = Array.from({ length: 12 }).map((_, i) => ({
+      id: `nbr_${i + 1}`,
+      petType: petTypes[rnd(0, petTypes.length - 1)],
+      health: rnd(40, 95),
+      streakDays: rnd(0, 30),
+      activeToday: Math.random() > 0.3,
+      lastLogTime: now - rnd(0, 48) * 3600 * 1000,
+    }));
+    set(() => ({ neighborhoodData: neighbors, communityStats: { totalLogs: rnd(200, 800), activeUsers: rnd(20, 60), weeklyGoal: 1000, unlocked: null } }));
+    get().saveData();
+  },
+  updateCommunityProgress: (increment = 1) => {
+    set((state) => {
+      const stats = { ...(state.communityStats || { totalLogs: 0, activeUsers: 0, weeklyGoal: 1000 }) };
+      stats.totalLogs = (stats.totalLogs || 0) + increment;
+      if (stats.totalLogs >= (stats.weeklyGoal || 1000) && !stats.unlocked) {
+        stats.unlocked = 'dog_park';
+      }
+      return { communityStats: stats };
+    });
+    get().saveData();
   },
   refreshWeeklyMissions: () => {
     const { missionTemplates } = require('../utils/missionsData');

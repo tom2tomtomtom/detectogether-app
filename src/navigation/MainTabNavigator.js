@@ -21,6 +21,7 @@ import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
 import PetStoreScreen from '../screens/PetStoreScreen';
 import MissionsScreen from '../screens/MissionsScreen';
+import NeighborhoodScreen from '../screens/NeighborhoodScreen';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -94,6 +95,7 @@ const StatsStackScreen = () => (
     <StatsStack.Screen name="StatsScreen" component={StatsScreen} />
     <StatsStack.Screen name="Achievements" component={AchievementsScreen} options={{ headerShown: true, title: 'Achievements' }} />
     <StatsStack.Screen name="Missions" component={MissionsScreen} options={{ headerShown: true, title: 'Weekly Missions' }} />
+    <StatsStack.Screen name="Neighborhood" component={NeighborhoodScreen} options={{ headerShown: true, title: 'Neighborhood' }} />
   </StatsStack.Navigator>
 );
 
