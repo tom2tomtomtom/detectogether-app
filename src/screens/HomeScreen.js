@@ -132,7 +132,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <ScrollView showsVerticalScrollIndicator={false} bounces={false} contentContainerStyle={styles.scrollContent}>
           {/* Greeting + mini mood dots */}
           <View style={[styles.greetingRow, { marginBottom: 12 }]}>
             <Text style={styles.greetingSmall}>Good {getTimeOfDay()}, {user.name || 'Friend'}!</Text>
@@ -178,27 +178,21 @@ const HomeScreen = ({ navigation }) => {
 
           {/* Module Cards Grid (2x2) */}
           <View style={styles.moduleGrid}>
-            {modules.map((m, idx) => (
-              <TouchableOpacity
-                key={m.id}
-                onPress={() => navigation.navigate('Track', { screen: m.route })}
-                activeOpacity={0.9}
-                style={[styles.cardBase, styles.moduleCard]}
-              >
-                <View style={styles.moduleHeaderRow}>
-                  <View style={[styles.iconWrap, { backgroundColor: m.lightColor }]}>
-                    <Icon name={m.icon} size={20} color={m.color} />
+            {modules.map((m) => (
+              <View key={m.id} style={styles.moduleWrapper}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Track', { screen: m.route })}
+                  activeOpacity={0.9}
+                  style={[styles.cardBase, styles.moduleCard]}
+                >
+                  <View>
+                    <Icon name={m.icon} size={24} color={m.color} />
+                    <Text style={styles.moduleName}>{m.title}</Text>
+                    <Text style={styles.moduleStats}>{moduleStatValue(m.id)}</Text>
                   </View>
-                  <Text style={styles.moduleName}>{m.title}</Text>
-                </View>
-                <View style={styles.moduleStatsRow}>
-                  <Text style={styles.statValue}>{moduleStatValue(m.id)}</Text>
-                  <Text style={styles.lastLogged}>{getLastLogTime(m.id === 'mind' ? 'headVision' : m.id)}</Text>
-                </View>
-                <TouchableOpacity style={styles.logButton} onPress={() => navigation.navigate('Track', { screen: m.route })}>
-                  <Text style={styles.logButtonText}>Log Now</Text>
+                  <Text style={styles.lastLoggedTiny}>{getLastLogTime(m.id === 'mind' ? 'headVision' : m.id)}</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
 
@@ -283,16 +277,12 @@ const styles = StyleSheet.create({
   },
   creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
-  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
-  moduleCard: { width: '48%' },
-  moduleHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  iconWrap: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 8 },
-  moduleName: { fontSize: 16, fontWeight: '700', color: '#1F2937' },
-  moduleStatsRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 },
-  statValue: { fontSize: 18, fontWeight: '800', color: '#1F2937' },
-  lastLogged: { fontSize: 12, color: '#6B7280' },
-  logButton: { marginTop: 4, height: 34, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
-  logButtonText: { color: '#FFF', fontWeight: '700' },
+  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 12 },
+  moduleWrapper: { width: '31%', marginBottom: 12 },
+  moduleCard: { height: 120, justifyContent: 'space-between', padding: 12 },
+  moduleName: { fontSize: 14, fontWeight: '600', color: '#1F2937', marginTop: 4 },
+  moduleStats: { fontSize: 18, fontWeight: 'bold', color: '#1F2937', marginTop: 4 },
+  lastLoggedTiny: { fontSize: 11, color: '#6B7280', alignSelf: 'flex-end' },
 });
 
 export default HomeScreen;
