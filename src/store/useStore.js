@@ -61,6 +61,10 @@ const useStore = create((set, get) => ({
     lastBalancedDate: null,
     toasts: [],
   },
+  // Missions
+  activeMissions: [],
+  completedMissions: [],
+  missionProgress: {},
   
   // Vista States for each tab
   vistaStates: {
@@ -83,6 +87,9 @@ const useStore = create((set, get) => ({
           healthLogs: { ...state.healthLogs, ...parsedData.healthLogs },
           achievements: { ...state.achievements, ...(parsedData.achievements || {}) },
           notifications: { ...state.notifications, ...(parsedData.notifications || {}) },
+          activeMissions: parsedData.activeMissions || state.activeMissions,
+          completedMissions: parsedData.completedMissions || state.completedMissions,
+          missionProgress: parsedData.missionProgress || state.missionProgress,
         }));
       }
     } catch (error) {
@@ -468,11 +475,41 @@ const useStore = create((set, get) => ({
         healthLogs: state.healthLogs,
         achievements: state.achievements,
         notifications: state.notifications,
+        activeMissions: state.activeMissions,
+        completedMissions: state.completedMissions,
+        missionProgress: state.missionProgress,
       };
       await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
     } catch (error) {
       console.error('Error saving user data:', error);
     }
+  },
+  refreshWeeklyMissions: () => {
+    const { missionTemplates } = require('../utils/missionsData');
+    set((state) => {
+      // pick 3 random missions not recently completed
+      const pool = missionTemplates.filter((m) => !state.completedMissions?.includes(m.id));
+      const selected = pool.sort(() => 0.5 - Math.random()).slice(0, 3);
+      return { activeMissions: selected, missionProgress: {} };
+    });
+    get().saveData();
+  },
+  updateMissionProgress: (missionId, increment = 1) => {
+    set((state) => ({ missionProgress: { ...(state.missionProgress || {}), [missionId]: (state.missionProgress?.[missionId] || 0) + increment } }));
+    get().saveData();
+  },
+  completeMission: (missionId) => {
+    set((state) => {
+      const mission = (state.activeMissions || []).find((m) => m.id === missionId);
+      if (!mission) return {};
+      const pet = { ...state.pet };
+      pet.careCredits = (pet.careCredits || 0) + (mission.reward?.credits || 0);
+      pet.totalCreditsEarned = (pet.totalCreditsEarned || 0) + (mission.reward?.credits || 0);
+      const completedMissions = Array.from(new Set([...(state.completedMissions || []), missionId]));
+      const activeMissions = (state.activeMissions || []).filter((m) => m.id !== missionId);
+      return { pet, completedMissions, activeMissions };
+    });
+    get().saveData();
   },
 }));
 
