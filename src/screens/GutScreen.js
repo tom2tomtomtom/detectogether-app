@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CreditAnimation from '../components/CreditAnimation';
 
 const GutScreen = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -20,7 +22,10 @@ const GutScreen = () => {
   const [selectedMealType, setSelectedMealType] = useState(null);
 
   const addHealthLog = useStore((state) => state.addHealthLog);
+  const addCredits = useStore((s) => s.addCredits);
   const gutLogs = useStore((state) => state.healthLogs.gut);
+  const lastLogTime = useStore((s) => s.pet.lastLogTime);
+  const [creditBurst, setCreditBurst] = useState(null);
 
   const gutStatusOptions = [
     { id: 1, label: 'Upset', color: '#EF4444', interpretation: 'Troubled digestion – rest and hydrate' },
@@ -53,6 +58,12 @@ const GutScreen = () => {
     });
     setShowStatusModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
+    addCredits(15, 'gut:status');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 30 : 15;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const handleMealQuickLog = (meal) => {
@@ -61,6 +72,12 @@ const GutScreen = () => {
       timing: meal.id,
     });
     Alert.alert('Noted!', `${meal.label}`);
+    addCredits(15, 'gut:meal');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 30 : 15;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const openMealModal = () => {
@@ -81,6 +98,12 @@ const GutScreen = () => {
     setShowMealModal(false);
     setSelectedMealType(null);
     Alert.alert('Logged!', `${selectedMealType.label} • Feeling: ${feeling}`);
+    addCredits(20, 'gut:meal+feeling');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 40 : 20;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const getTodayLogs = () => {
@@ -95,7 +118,7 @@ const GutScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Vista tabName="gut" />
+      <Vista tabName="gut" moduleType="gut" />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Module Header */}
@@ -193,6 +216,15 @@ const GutScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {creditBurst && (
+        <CreditAnimation
+          amount={creditBurst.amount}
+          x={creditBurst.x}
+          y={creditBurst.y}
+          combo={creditBurst.combo}
+          onEnd={() => setCreditBurst(null)}
+        />
+      )}
 
       {/* Gut Status Modal */}
       <Modal

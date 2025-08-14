@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CreditAnimation from '../components/CreditAnimation';
 
 const DermalMapScreen = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -21,7 +23,10 @@ const DermalMapScreen = () => {
   const [selectedArea, setSelectedArea] = useState(null);
 
   const addHealthLog = useStore((state) => state.addHealthLog);
+  const addCredits = useStore((s) => s.addCredits);
   const skinLogs = useStore((state) => state.healthLogs.skin);
+  const lastLogTime = useStore((s) => s.pet.lastLogTime);
+  const [creditBurst, setCreditBurst] = useState(null);
 
   const skinStatusOptions = [
     { id: 1, label: 'Inflamed', color: '#EF4444', interpretation: 'Irritated – consider calming care' },
@@ -49,6 +54,12 @@ const DermalMapScreen = () => {
     });
     setShowStatusModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
+    addCredits(25, 'skin:status');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 50 : 25;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const handleObservationQuickLog = (item) => {
@@ -57,6 +68,12 @@ const DermalMapScreen = () => {
       time: item.id,
     });
     Alert.alert('Noted!', `${item.label}`);
+    addCredits(15, 'skin:observation');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 30 : 15;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const openObservationModal = () => {
@@ -84,6 +101,12 @@ const DermalMapScreen = () => {
     setSelectedTime(null);
     setSelectedArea(null);
     Alert.alert('Logged!', `${selectedTime.label} • ${selectedArea} • ${condition}`);
+    addCredits(20, 'skin:observation+details');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 40 : 20;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const getTodayLogs = () => {
@@ -103,7 +126,7 @@ const DermalMapScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Vista tabName="dermalMap" />
+      <Vista tabName="dermalMap" moduleType="skin" />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Module Header */}
@@ -201,6 +224,15 @@ const DermalMapScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {creditBurst && (
+        <CreditAnimation
+          amount={creditBurst.amount}
+          x={creditBurst.x}
+          y={creditBurst.y}
+          combo={creditBurst.combo}
+          onEnd={() => setCreditBurst(null)}
+        />
+      )}
 
       {/* Skin Status Modal */}
       <Modal

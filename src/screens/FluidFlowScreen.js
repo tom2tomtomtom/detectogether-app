@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CreditAnimation from '../components/CreditAnimation';
 
 const FluidFlowScreen = () => {
   const [showColorModal, setShowColorModal] = useState(false);
@@ -19,6 +21,7 @@ const FluidFlowScreen = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   
   const addHealthLog = useStore((state) => state.addHealthLog);
+  const addCredits = useStore((s) => s.addCredits);
   const healthLogs = useStore((state) => state.healthLogs.hydration);
 
   const colorOptions = [
@@ -34,6 +37,10 @@ const FluidFlowScreen = () => {
     { amount: 16, label: '+16 oz' },
   ];
 
+  const lastLogTime = useStore((s) => s.pet.lastLogTime);
+
+  const [creditBurst, setCreditBurst] = useState(null);
+
   const handleColorLog = (option) => {
     addHealthLog('hydration', {
       type: 'color',
@@ -43,6 +50,12 @@ const FluidFlowScreen = () => {
     });
     setShowColorModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 20 : 10;
+    addCredits(10, 'hydration:color', combo);
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const handleHydrationLog = (amount) => {
@@ -52,6 +65,12 @@ const FluidFlowScreen = () => {
       unit: 'oz',
     });
     Alert.alert('Great job!', `${amount}oz logged! Your garden is thriving.`);
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 20 : 10;
+    addCredits(10, 'hydration:intake', combo);
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const getTodayLogs = () => {
@@ -69,7 +88,7 @@ const FluidFlowScreen = () => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Vista tabName="fluidFlow" />
+      <Vista tabName="fluidFlow" moduleType="fluid" />
       
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Module Header */}
@@ -166,6 +185,15 @@ const FluidFlowScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {creditBurst && (
+        <CreditAnimation
+          amount={creditBurst.amount}
+          x={creditBurst.x}
+          y={creditBurst.y}
+          combo={creditBurst.combo}
+          onEnd={() => setCreditBurst(null)}
+        />
+      )}
 
       {/* Color Assessment Modal */}
       <Modal

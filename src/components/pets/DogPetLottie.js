@@ -53,3 +53,5 @@ export default function DogPetLottie({ mood = 'normal', color = 'golden', size =
     />
   );
 }
+
+

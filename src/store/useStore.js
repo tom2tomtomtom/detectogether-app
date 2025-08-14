@@ -30,7 +30,11 @@ const useStore = create((set, get) => ({
     health: 50,
     level: 1,
     careCredits: 0,
+    totalCreditsEarned: 0,
+    creditHistory: [],
     environment: 'starter_room',
+    petEnvironmentLevel: 0,
+    environmentUnlockDates: {},
   },
   
   // Health Logs
@@ -147,10 +151,40 @@ const useStore = create((set, get) => ({
       },
     }));
     get().updatePetStatus(type);
+    // award base credits per module
+    const moduleBase = { hydration: 10, energy: 10, gut: 15, headVision: 10, skin: 25 };
+    const amount = moduleBase[type] || 5;
+    get().addCredits(amount, `log:${type}`);
     get().updateVistaState(type);
     get().checkAchievements(type);
     get().saveData();
   },  
+  // Credits API
+  addCredits: (amount, source = 'action', combo = false) => {
+    set((state) => {
+      const now = Date.now();
+      const last = state.pet.lastLogTime || 0;
+      const withinCombo = now - last <= 5 * 60 * 1000; // 5 minutes
+      const multiplier = combo || withinCombo ? 2 : 1;
+      const earned = amount * multiplier;
+      const pet = { ...state.pet };
+      pet.careCredits = (pet.careCredits || 0) + earned;
+      pet.totalCreditsEarned = (pet.totalCreditsEarned || 0) + earned;
+      pet.lastLogTime = now;
+      const creditHistory = [
+        ...(pet.creditHistory || []),
+        { ts: now, amount: earned, base: amount, source, multiplier },
+      ].slice(-200);
+      pet.creditHistory = creditHistory;
+      return { pet };
+    });
+    // milestone checks
+    const total = get().pet.totalCreditsEarned;
+    if (total >= 100) get().unlockAchievement?.('credits_100_getting_started');
+    if (total >= 500) get().unlockAchievement?.('credits_500_accessory');
+    if (total >= 1000) get().unlockAchievement?.('credits_1000_env_upgrade');
+    get().saveData();
+  },
   updatePetStatus: (actionType) => {
     set((state) => {
       const pet = { ...state.pet };
@@ -360,6 +394,27 @@ const useStore = create((set, get) => ({
     const triedAll = MODULE_KEYS.every((k) => (get().achievements.moduleCounts[k] || 0) > 0);
     if (triedAll) get().unlockAchievement('explorer_try_all');
     if (streakDays >= 7) get().unlockAchievement('explorer_first_week');
+    // environment upgrades
+    get().checkEnvironmentUpgrade();
+  },
+  checkEnvironmentUpgrade: () => {
+    set((state) => {
+      const pet = { ...state.pet };
+      const now = Date.now();
+      const credits = pet.totalCreditsEarned || 0;
+      const streak = state.achievements.streakDays || 0;
+      const nextLevel = pet.petEnvironmentLevel || 0;
+      let targetLevel = nextLevel;
+      if (streak >= 60 && credits >= 3000) targetLevel = Math.max(targetLevel, 4);
+      else if (streak >= 30 && credits >= 1500) targetLevel = Math.max(targetLevel, 3);
+      else if (streak >= 14 && credits >= 500) targetLevel = Math.max(targetLevel, 2);
+      else if (streak >= 7) targetLevel = Math.max(targetLevel, 1);
+      if (targetLevel > nextLevel) {
+        pet.petEnvironmentLevel = targetLevel;
+        pet.environmentUnlockDates = { ...(pet.environmentUnlockDates || {}), [targetLevel]: now };
+      }
+      return { pet };
+    });
   },
   
   saveData: async () => {

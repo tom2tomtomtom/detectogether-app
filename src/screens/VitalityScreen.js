@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CreditAnimation from '../components/CreditAnimation';
 
 const VitalityScreen = () => {
   const [showEnergyModal, setShowEnergyModal] = useState(false);
@@ -20,7 +22,10 @@ const VitalityScreen = () => {
   const [selectedBrew, setSelectedBrew] = useState(null);
 
   const addHealthLog = useStore((state) => state.addHealthLog);
+  const addCredits = useStore((s) => s.addCredits);
   const healthLogs = useStore((state) => state.healthLogs.energy);
+  const lastLogTime = useStore((s) => s.pet.lastLogTime);
+  const [creditBurst, setCreditBurst] = useState(null);
 
   const energyOptions = [
     { id: 1, label: 'Drained', color: '#9CA3AF', interpretation: 'Running on empty – consider rest + gentle movement' },
@@ -54,6 +59,12 @@ const VitalityScreen = () => {
     });
     setShowEnergyModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
+    addCredits(10, 'energy:status');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 20 : 10;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const handleBrewQuickLog = (opt) => {
@@ -63,6 +74,12 @@ const VitalityScreen = () => {
       caffeinated: opt.caffeinated,
     });
     Alert.alert('Noted!', `${opt.label}`);
+    addCredits(5, 'energy:brew');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 10 : 5;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const handleOpenBrewModal = () => {
@@ -84,6 +101,12 @@ const VitalityScreen = () => {
     setShowBrewModal(false);
     setSelectedBrew(null);
     Alert.alert('Logged!', `${selectedBrew.label} • Feeling: ${feeling}`);
+    addCredits(5, 'energy:brew+feeling');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 10 : 5;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const getTodayLogs = () => {
@@ -98,7 +121,7 @@ const VitalityScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Vista tabName="vitality" />
+      <Vista tabName="vitality" moduleType="vitality" />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Module Header */}
@@ -196,6 +219,15 @@ const VitalityScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {creditBurst && (
+        <CreditAnimation
+          amount={creditBurst.amount}
+          x={creditBurst.x}
+          y={creditBurst.y}
+          combo={creditBurst.combo}
+          onEnd={() => setCreditBurst(null)}
+        />
+      )}
 
       {/* Energy Status Modal */}
       <Modal

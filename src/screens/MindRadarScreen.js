@@ -8,10 +8,12 @@ import {
   SafeAreaView,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CreditAnimation from '../components/CreditAnimation';
 
 const MindRadarScreen = () => {
   const [showStressModal, setShowStressModal] = useState(false);
@@ -20,7 +22,10 @@ const MindRadarScreen = () => {
   const [selectedCheckin, setSelectedCheckin] = useState(null);
 
   const addHealthLog = useStore((state) => state.addHealthLog);
+  const addCredits = useStore((s) => s.addCredits);
   const mindLogs = useStore((state) => state.healthLogs.headVision);
+  const lastLogTime = useStore((s) => s.pet.lastLogTime);
+  const [creditBurst, setCreditBurst] = useState(null);
 
   const stressOptions = [
     { id: 1, label: 'Overwhelmed', color: '#5B21B6', interpretation: 'High stress – pause and breathe' },
@@ -53,6 +58,12 @@ const MindRadarScreen = () => {
     });
     setShowStressModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
+    addCredits(10, 'mind:status');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 20 : 10;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const handleCheckinQuickLog = (item) => {
@@ -61,6 +72,12 @@ const MindRadarScreen = () => {
       time: item.id,
     });
     Alert.alert('Noted!', `${item.label}`);
+    addCredits(10, 'mind:checkin');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 20 : 10;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const openCheckinModal = () => {
@@ -81,6 +98,12 @@ const MindRadarScreen = () => {
     setShowCheckinModal(false);
     setSelectedCheckin(null);
     Alert.alert('Logged!', `${selectedCheckin.label} • Mind: ${feeling}`);
+    addCredits(10, 'mind:checkin+feeling');
+    const now = Date.now();
+    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
+    const earned = combo ? 20 : 10;
+    const { width } = Dimensions.get('window');
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
   const getTodayLogs = () => {
@@ -100,7 +123,7 @@ const MindRadarScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Vista tabName="mindRadar" />
+      <Vista tabName="mindRadar" moduleType="mind" />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Module Header */}
@@ -198,6 +221,15 @@ const MindRadarScreen = () => {
           </View>
         </View>
       </ScrollView>
+      {creditBurst && (
+        <CreditAnimation
+          amount={creditBurst.amount}
+          x={creditBurst.x}
+          y={creditBurst.y}
+          combo={creditBurst.combo}
+          onEnd={() => setCreditBurst(null)}
+        />
+      )}
 
       {/* Stress Level Modal */}
       <Modal

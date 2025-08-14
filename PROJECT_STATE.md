@@ -3,8 +3,8 @@
 ## Current Project
 - Name: DetecTogether App
 - Type: React Native Mobile App (Expo) with web-ready scaffolding
-- Size: ~6,000+ lines
-- Status: Phase 2 Complete + Major UI Redesign Complete!
+- Size: ~7,000+ lines
+- Status: Phase 2 In Progress - Core features complete, gamification pending
 
 ## Tech Stack
 - Frontend: React Native with Expo
@@ -27,7 +27,8 @@
 - Session 8: Expo notifications (service, settings, smart scheduling)
 - Session 9: Major UI Redesign - Modern theme, simplified navigation, beautiful cards
 - Session 10: Persistent 4-tab navigation, Track stack holds health modules, FAB wired, nested nav fixes
-- Last Updated: 2025-08-13 (Evening)
+- Session 11: Module carousel on Home, SVG pets, UI improvements
+- Last Updated: 2025-08-14 (Evening)
 
 ## Progress Tracking
 - [x] Project setup
@@ -42,10 +43,17 @@
 - [x] Dermal Map screen
 - [x] Account screen (Basic version)
 - [x] Onboarding flow
-- [x] Pet selection and animation (baseline: emojis + reanimated states)
+- [x] Pet selection and animation (SVG-based with animations)
 - [x] Push notifications (Expo) with settings
 - [x] Achievement system (badges, progress, notifications)
+- [x] Module carousel on Home screen
+- [x] 4-tab navigation with good UX
+- [ ] Gamification elements (Care Credits, Pet Environment, Missions)
+- [ ] Module-specific vistas
+- [ ] Hacks sections (Tips, Marketplace, Education)
 - [ ] Photo capture/analysis
+- [ ] QR code scanning
+- [ ] Social features (Neighborhood)
 - [ ] Backend API integration
 - [ ] Testing
 - [ ] Deployment
@@ -62,12 +70,16 @@
    - Dermal Map (skin observations)
 5. **Home Dashboard**: 
    - Modern UI with mood selector
-   - Circular progress with pet integration
-   - Stats cards with colorful icons
-   - Health modules carousel
-   - Insights card with gradient
-   - Beautiful rounded cards with shadows
-6. **Pet System**: `PetCharacter` with reanimated states (happy/normal/sad/critical/celebrating) integrated in progress circle
+   - Circular progress with pet integration (needs circular ring)
+   - Module carousel with 280x160px cards
+   - Improved status cards layout
+   - Health modules with gradients and "Log Now" buttons
+   - Page indicators for carousel
+6. **Pet System**: 
+   - SVG-based pets (cat, dog, bunny, axolotl)
+   - Mood-based animations (happy/normal/sad/critical)
+   - Integrated in progress circle
+   - Still needs: ear attachment fix, richer animations
 7. **Onboarding**: Welcome, benefits, pet selection carousel, name pet, gating in `App.js`
 8. **Achievements**: Definitions, badge UI, progress + unlocks, points, moved to Stats screen
 9. **Notifications**: Expo service, smart scheduling, settings integrated into Profile
@@ -82,72 +94,81 @@
     - TrackingHubScreen: Central hub for all health modules
     - StatsScreen: Achievements and progress tracking
 
-## Next Steps
-1. Refine notifications
-   - Module-specific reminders tied to in-module toggles
-   - Deeper response handling (deep link to target module)
-   - Improve smart scheduling windows
-2. Trends & charts
-   - 7/30-day views per module, streak visualizations
-3. Camera & media (Phase 3)
-   - Skin and meal photos; local storage and simple galleries
-4. Backend sync (Phase 4)
-   - Auth + cloud sync (Supabase/Firebase), push token storage
-5. Pet & UX polish
-   - More pet moods (sleeping/idle), richer visuals than emojis
-   - Polish custom tab bar and FAB accessibility
-6. Testing & analytics
-   - Unit/integration/E2E; Sentry + analytics
+## 🎯 REMAINING FROM BRIEF
 
-## 🎯 PHASE 2: Pet & Gamification (Current Focus)
+### Gamification Elements (Priority 1)
+- [ ] **Care Credits System**
+  - Add points for each health action
+  - Display total in Stats/Profile
+  - Combo bonuses for multiple logs
+  - Visual feedback (+10 animation)
+- [ ] **Pet Environment Progression**
+  - Start: Simple white circle
+  - 7 days: Add grass/ground
+  - 14 days: Add trees/plants
+  - 30 days: Full park scene
+  - Store as petEnvironmentLevel
+- [ ] **Adventure Missions**
+  - Weekly challenges
+  - "Log 5 hydrations → unlock riverside walk"
+  - Progress bars for each mission
+- [ ] **Pet Moments/Memories**
+  - Capture animations as collectible cards
+  - Pin to vista as scrapbook
+- [ ] **Neighborhood Pets**
+  - See friends' pets (anonymized)
+  - Community milestones
+  - "Your street logged 10,000 points!"
 
-### Step 1: Pet Animation System (2-3 hours)
-**Tool**: Cursor
-**Command**: "Add pet animations using React Native Reanimated 2"
-- [x] Create PetCharacter.js component
-- [x] Add 5 pet types (dog, cat, bird, bunny, dragon)
-- [x] Implement mood-based animations:
-  - Happy: bounce/wiggle
-  - Normal: gentle float
-  - Sad: droop/shrink
-  - Critical: shrink/fade
-  - Celebrating: spin
-- [x] Connect animations to health score
-- [x] Add pet selection to store
-- [ ] Add sleeping/idle variants and richer art
+### Module Features (Priority 2)
+- [ ] **Module-Specific Vistas**
+  - Fluid Flow: Water garden with plants
+  - Vitality: Sunrise with energy particles
+  - Gut: Garden with soil/compost
+  - Mind's Radar: Calm sky with curtains
+  - Dermal Map: Mirror with soft lighting
+- [ ] **Hacks Section per Module**
+  - Tips & Tricks (swipeable cards)
+  - Marketplace (product recommendations)
+  - Education (curated articles)
+- [ ] **Module Notification Toggles**
+  - Morning reminder on/off
+  - Evening reminder on/off
+  - Store per module preferences
+- [ ] **QR Code Scanning**
+  - Quick logging via bathroom QR
+  - Deep link to specific modules
+- [ ] **Photo Capture/Analysis**
+  - Fluid Flow: Urine color photos
+  - Gut: Stool analysis (with privacy blur)
+  - Dermal Map: Skin tracking photos
 
-### Step 2: Onboarding Flow (2 hours)
-**Tool**: Cursor
-**Command**: "Create onboarding screens with pet selection"
-- [x] Welcome screen with app benefits
-- [x] Pet selection carousel
-- [x] Name your pet screen
-- [x] Notification permissions (requested after onboarding)
-- [ ] Quick tutorial (5 swipeable cards)
-- [ ] Set initial health baseline
+### Quick Wins (Can do now)
+- [ ] Fix pet ear detachment in animations
+- [ ] Add circular progress ring on Home
+- [ ] Improve module card gradients
+- [ ] Add "last logged" timestamps
 
-### Step 3: Achievement System (2 hours)
-**Tool**: Cursor
-**Command**: "Build achievement/badge system"
-- [x] Create achievements data structure
-- [x] Badge components (locked/unlocked states)
-- [x] Achievement categories (Streaks, Mastery, Balance, Explorer, Special)
-- [x] Achievement notifications
-- [x] Progress tracking in store
+## 🎯 PHASE 2: Pet & Gamification (Current Focus - UPDATED)
 
-### Step 4: Push Notifications (1-2 hours)
-**Tool**: Cursor + Expo docs
-**Command**: "Set up Expo push notifications"
-- [x] Install expo-notifications
-- [x] Create notification service
-- [x] Implement notification types:
-  - Morning check-in (8am)
-  - Hydration reminders (every 2 hours)
-  - Module-specific (based on settings)
-  - Streak maintenance
-  - Achievement unlocked
-- [x] Smart scheduling based on user patterns
-- [x] Notification preferences screen
+### Completed ✅
+- [x] Pet Animation System (SVG-based)
+- [x] Onboarding Flow (pet selection, naming)
+- [x] Achievement System (badges, categories)
+- [x] Push Notifications (basic setup)
+- [x] Module Carousel on Home
+
+### Still Needed from Brief
+- [ ] Care Credits (points system)
+- [ ] Pet Environment Progression
+- [ ] Adventure Missions
+- [ ] Pet Moments (memory cards)
+- [ ] Neighborhood/Social Layer
+- [ ] Module-specific vistas
+- [ ] Hacks sections (Tips, Marketplace, Education)
+- [ ] Per-module notification toggles
+- [ ] QR code scanning
+- [ ] Quick tutorial (5 cards)
 
 ## 🎯 PHASE 3: Advanced Features
 

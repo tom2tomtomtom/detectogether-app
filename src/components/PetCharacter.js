@@ -9,8 +9,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { useStore } from '../store/useStore';
-import DogPet from './pets/DogPet';
-import DogPetLottie from './pets/DogPetLottie';
+import ModernPet from './pets/ModernPet';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -82,18 +81,8 @@ const PetCharacter = ({ petType = 'dog', healthScore = 50, mood, isAnimating = t
   const petColor = user?.petColor || 'golden';
 
   const renderPet = () => {
-    switch (petType) {
-      case 'dog':
-        return (
-          <>
-            <DogPetLottie mood={derivedState} color={petColor} size={size} />
-            {/* Fallback SVG in case Lottie asset isn't available */}
-            {/* <DogPet mood={derivedState} color={petColor} size={size} /> */}
-          </>
-        );
-      default:
-        return <DogPet mood={derivedState} color={petColor} size={size} />;
-    }
+    const mappedType = petType === 'cat' ? 'cat' : petType === 'bunny' ? 'bunny' : 'dog';
+    return <ModernPet petType={mappedType} mood={derivedState} size={size} />;
   };
 
   return (

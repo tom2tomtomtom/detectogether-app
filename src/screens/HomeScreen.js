@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   View,
   Text,
   TouchableOpacity,
+  Pressable,
   StyleSheet,
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MoodSelector from '../components/MoodSelector';
-import PetCharacter from '../components/PetCharacter';
+import PetHero from '../components/PetHero';
+import ModuleCarousel from '../components/ModuleCarousel';
+import StatusGrid from '../components/StatusGrid';
+import CreditAnimation from '../components/CreditAnimation';
 import { useStore } from '../store/useStore';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
@@ -22,8 +23,9 @@ const HomeScreen = ({ navigation }) => {
   const user = useStore((state) => state.user);
   const pet = useStore((state) => state.pet);
   const [selectedMood, setSelectedMood] = useState(3);
-
   const overallScore = Math.round((pet.health + pet.energy + pet.happiness) / 3);
+  const progressWidth = 260; // visual width for styles only
+  const [creditBurst, setCreditBurst] = useState(null);
   
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
@@ -80,131 +82,71 @@ const HomeScreen = ({ navigation }) => {
     },
   ];
 
+  const statusText = useMemo(() => {
+    if (overallScore >= 80) return 'Your pet is thriving!';
+    if (overallScore >= 60) return 'Your pet is doing well';
+    if (overallScore >= 40) return 'Your pet needs some care';
+    return 'Your pet needs attention';
+  }, [overallScore]);
+
   return (
-    <LinearGradient
-      colors={[colors.background, colors.backgroundSecondary]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView 
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Greeting Card */}
-          <View style={[styles.card, styles.greetingCard]}>
-            <Text style={styles.greeting}>
-              Good {getTimeOfDay()}, {user.name || 'Friend'}!
-            </Text>
-            <Text style={styles.question}>How are you feeling today?</Text>
-            <MoodSelector
-              selectedMood={selectedMood}
-              onMoodSelect={setSelectedMood}
-            />
-          </View>
-
-          {/* Hero Progress Card */}
-          <View style={[styles.card, styles.heroCard]}>
-            <AnimatedCircularProgress
-              size={200}
-              width={15}
-              fill={overallScore}
-              tintColor={colors.primary}
-              backgroundColor={colors.border}
-              lineCap="round"
-              rotation={0}
-            >
-              {() => (
-                <View style={styles.progressContent}>
-                  <Text style={styles.progressNumber}>{overallScore}%</Text>
-                  <View style={styles.petContainer}>
-                    <PetCharacter 
-                      petType={user.petType || 'cat'} 
-                      healthScore={overallScore}
-                      size={60}
-                      isAnimating={true}
-                    />
-                  </View>
-                </View>
-              )}
-            </AnimatedCircularProgress>
-
-            {/* Stats Row */}
-            <View style={styles.statsRow}>
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: colors.hydrationLight }]}>
-                  <Text>💧</Text>
-                </View>
-                <Text style={styles.statValue}>{Math.round(overallScore * 0.025 * 100) / 100}L</Text>
-                <Text style={styles.statLabel}>Hydration</Text>
-              </View>
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: colors.energyLight }]}>
-                  <Text>⚡</Text>
-                </View>
-                <Text style={styles.statValue}>{pet.energy}%</Text>
-                <Text style={styles.statLabel}>Energy</Text>
-              </View>
-              <View style={styles.statCard}>
-                <View style={[styles.statIcon, { backgroundColor: colors.mindLight }]}>
-                  <Text>🧠</Text>
-                </View>
-                <Text style={styles.statValue}>{selectedMood >= 4 ? 'Great' : selectedMood === 3 ? 'Good' : 'Okay'}</Text>
-                <Text style={styles.statLabel}>Mood</Text>
-              </View>
+          {/* Greeting + mini mood dots */}
+          <View style={styles.greetingRow}>
+            <Text style={styles.greetingSmall}>Good {getTimeOfDay()}, {user.name || 'Friend'}!</Text>
+            <View style={styles.moodDots}>
+              {[1,2,3,4,5].map((m) => (
+                <TouchableOpacity key={m} onPress={() => setSelectedMood(m)} style={[styles.moodDot, selectedMood === m && styles.moodDotActive]} />
+              ))}
             </View>
           </View>
 
-          {/* Track Your Health Section */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Track Your Health</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>See all</Text>
-            </TouchableOpacity>
+          {/* Pet Hero Section */}
+          <View style={styles.heroSection}>
+            <PetHero healthScore={overallScore} petType={user.petType || 'dog'} size={240} petSize={200} />
+            {/* Care credits badge */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+              <Text style={{ fontSize: 16 }}>🪙</Text>
+              <Text style={{ marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#2E7D32' }}>{pet.careCredits || 0}</Text>
+            </View>
+
+          {/* Status text */}
+          <Text style={[styles.statusText, { marginTop: 16 }]}>{statusText}</Text>
           </View>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.modulesScroll}
-          >
-            {modules.map((module) => (
-              <TouchableOpacity
-                key={module.id}
-                style={[styles.card, styles.moduleCard]}
-                onPress={() => navigation.navigate('Track', { screen: module.route })}
-              >
-                <View style={[styles.moduleIcon, { backgroundColor: module.lightColor }]}>
-                  <Icon name={module.icon} size={24} color={module.color} />
-                </View>
-                <Text style={styles.moduleTitle}>{module.title}</Text>
-                <Text style={styles.moduleStatus}>{module.status}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {/* Module Carousel */}
+          <ModuleCarousel modules={modules} />
 
-          {/* Insights Card */}
-          <LinearGradient
-            colors={[colors.primary, colors.mind]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.card, styles.insightsCard]}
-          >
-            <Text style={styles.insightsEmoji}>✨</Text>
-            <Text style={styles.insightsTitle}>Today's Insight</Text>
-            <Text style={styles.insightsText}>
-              Your hydration levels have been consistently good this week! 
-              Keep up the great work. {user.petName || 'Your buddy'} is extra happy today! 🎉
-            </Text>
-          </LinearGradient>
+          {/* Bottom status grid */}
+          <StatusGrid
+            data={{
+              hydration: `${Math.round(overallScore * 0.025 * 100) / 100}L`,
+              energy: `${pet.energy}%`,
+              mind: selectedMood >= 4 ? 'Good' : selectedMood === 3 ? 'OK' : 'Low',
+              mood: selectedMood,
+            }}
+            onPress={(id) => {
+              const route = id === 'hydration' ? 'FluidFlow' : id === 'energy' ? 'Vitality' : id === 'mind' ? 'MindRadar' : 'Gut';
+              navigation.navigate('Track', { screen: route });
+            }}
+          />
+
+          {/* (Moved deeper features to tab navigation) */}
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#C8E6C9',
   },
   safeArea: {
     flex: 1,
@@ -213,146 +155,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: 120,
   },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.xl,
-    padding: spacing.lg,
+  greetingRow: {
+    marginTop: spacing.lg,
     marginBottom: spacing.lg,
-    ...shadows.md,
-  },
-  greetingCard: {
-    marginTop: spacing.md,
-  },
-  greeting: {
-    fontSize: typography.md,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  question: {
-    fontSize: typography.xxl,
-    fontWeight: typography.bold,
-    color: colors.textPrimary,
-    marginBottom: spacing.lg,
-  },
-  heroCard: {
-    alignItems: 'center',
-    paddingVertical: spacing.xl,
-  },
-  progressContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  progressNumber: {
-    fontSize: typography.huge,
-    fontWeight: typography.bold,
-    color: colors.textPrimary,
-    lineHeight: typography.huge,
-    marginBottom: -10,
-  },
-  petContainer: {
-    marginTop: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    marginTop: spacing.xl,
-    gap: spacing.md,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    alignItems: 'center',
-  },
-  statIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-  },
-  statValue: {
-    fontSize: typography.xl,
-    fontWeight: typography.bold,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  statLabel: {
-    fontSize: typography.xs,
-    color: colors.textSecondary,
-  },
-  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.md,
   },
-  sectionTitle: {
-    fontSize: typography.xl,
-    fontWeight: typography.bold,
-    color: colors.textPrimary,
-  },
-  seeAll: {
-    fontSize: typography.sm,
-    color: colors.primary,
-  },
-  modulesScroll: {
-    marginHorizontal: -spacing.lg,
-    paddingHorizontal: spacing.lg,
-  },
-  moduleCard: {
-    width: 140,
-    marginRight: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  moduleIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  moduleTitle: {
-    fontSize: typography.sm,
-    fontWeight: typography.semibold,
-    color: colors.textPrimary,
-    marginBottom: spacing.xs,
-  },
-  moduleStatus: {
-    fontSize: typography.xs,
+  greetingSmall: {
+    fontSize: typography.md,
     color: colors.textSecondary,
   },
-  insightsCard: {
-    position: 'relative',
-    overflow: 'hidden',
+  moodDots: {
+    flexDirection: 'row',
+    gap: 6,
   },
-  insightsEmoji: {
-    position: 'absolute',
-    right: spacing.lg,
-    top: spacing.lg,
-    fontSize: 40,
-    opacity: 0.3,
+  moodDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#DDD',
   },
-  insightsTitle: {
-    fontSize: typography.lg,
+  moodDotActive: {
+    backgroundColor: '#5856D6',
+  },
+  heroSection: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  healthPercent: {
+    marginTop: spacing.lg,
+    fontSize: 48,
     fontWeight: typography.bold,
-    color: colors.textWhite,
-    marginBottom: spacing.sm,
+    color: '#5856D6',
   },
-  insightsText: {
-    fontSize: typography.sm,
-    color: colors.textWhite,
-    opacity: 0.9,
-    lineHeight: 20,
+  // removed linear progress styles
+  statusText: {
+    marginTop: spacing.sm,
+    fontSize: typography.md,
+    color: colors.textSecondary,
+  },
+  miniRow: {
+    marginTop: 24,
   },
 });
 

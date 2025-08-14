@@ -29,13 +29,19 @@ const ProfileStack = createStackNavigator();
 // Tab Bar
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   const iconMap = { Home: 'home', Track: 'fitness', Stats: 'stats-chart', Profile: 'person' };
+  const onLongPressTrack = () => descriptors[state.routes[1].key]?.navigation?.navigate('Track');
   return (
     <View style={styles.tabBar}>
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
         const onPress = () => !isFocused && navigation.navigate(route.name);
         return (
-          <TouchableOpacity key={route.key} onPress={onPress} style={styles.tab}>
+          <TouchableOpacity
+            key={route.key}
+            onPress={onPress}
+            onLongPress={route.name === 'Track' ? onLongPressTrack : undefined}
+            style={styles.tab}
+          >
             <Icon name={iconMap[route.name]} size={24} color={isFocused ? colors.primary : colors.textSecondary} />
             {isFocused && <View style={styles.activeIndicator} />}
           </TouchableOpacity>
