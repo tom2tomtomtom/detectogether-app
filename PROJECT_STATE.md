@@ -75,12 +75,13 @@
    - Mind's Radar (stress & mood)
    - Dermal Map (skin observations)
 5. **Home Dashboard**: 
-   - Modern UI with mood selector
-   - Circular progress with pet integration (needs circular ring)
-   - Module carousel with 280x160px cards
-   - Improved status cards layout
-   - Health modules with gradients and "Log Now" buttons
-   - Page indicators for carousel
+   - No-scroll optimized layout (fits all screens)
+   - Circular progress ring with pet at 98%
+   - 3-column module grid (5 health + 1 About)
+   - Integrated stats within module cards
+   - Tappable credits button → Pet Store
+   - Neighborhood card with community progress
+   - Translucent card design (rgba(255,255,255,0.7))
  6. **Pet System**: 
     - ModernPet SVG with mood animations + tail/ear fixes
     - PetEnvironment scenes (levels 0–4)
@@ -95,9 +96,25 @@
     - Warm color palette (#F5F0E8 background)
     - Module-specific color coding
     - MoodSelector component
- 12. **New Screens**:
-     - TrackingHubScreen (modules hub)
-     - StatsScreen (credits, streaks, achievements, missions preview)
+12. **New Screens**:
+    - TrackingHubScreen (modules hub)
+    - StatsScreen (credits, streaks, achievements, missions preview)
+    - PetStoreScreen (purchase accessories, colors, effects)
+    - MissionsScreen (weekly challenges with rewards)
+    - AboutScreen (app guide and help)
+13. **Gamification Complete**:
+    - Care Credits system with combo multipliers
+    - Pet Store with purchasable items
+    - Pet Environment progression (5 levels)
+    - Weekly missions with progress tracking
+    - Module-specific vistas for each health area
+    - Credit animations on successful logs
+14. **UI Polish**:
+    - Fixed pet animation overlaps
+    - Removed FAB button
+    - Consistent translucent cards
+    - Proper text containment in cards
+    - Crown accessory showing on pet
      - MissionsScreen (weekly quests)
      - PetStoreScreen (buy/equip items)
 

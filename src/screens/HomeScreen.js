@@ -108,7 +108,11 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleModulePress = (m) => {
-    navigation.navigate('Track', { screen: m.route });
+    if (m.id === 'about' || m.route === 'About') {
+      navigation.navigate('Stats', { screen: 'About' });
+    } else {
+      navigation.navigate('Track', { screen: m.route });
+    }
   };
 
   const { height: screenHeight } = Dimensions.get('window');
