@@ -117,9 +117,9 @@ const HomeScreen = ({ navigation }) => {
 
   const { height: screenHeight } = Dimensions.get('window');
   const isSmallScreen = screenHeight < 700;
-  const ringSize = 190;
-  const circleSize = isSmallScreen ? 160 : 180;
-  const petPixel = 140;
+  const ringSize = isSmallScreen ? 210 : 230;
+  const circleSize = isSmallScreen ? 180 : 200;
+  const petPixel = isSmallScreen ? 155 : 170;
 
   return (
     <View style={styles.container}>
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   moodDotActive: {
     backgroundColor: '#5856D6',
   },
-  heroSection: { alignItems: 'center', marginBottom: 12 },
+  heroSection: { alignItems: 'center', marginTop: 8, marginBottom: 12 },
   healthPercent: {
     marginTop: spacing.lg,
     fontSize: 48,
