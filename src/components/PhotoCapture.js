@@ -9,6 +9,7 @@ import {
   Platform
 } from 'react-native';
 import { Camera, CameraType, FlashMode } from 'expo-camera';
+import { BackHandler } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { BlurView } from 'expo-blur';
@@ -40,6 +41,15 @@ const PhotoCapture = ({
       setShowBlur(true);
     }
   }, [analysisType, autoBlur]);
+
+  // Handle hardware back press to close capture
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (onClose) onClose();
+      return true;
+    });
+    return () => sub.remove();
+  }, [onClose]);
 
   const requestPermissions = async () => {
     const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();

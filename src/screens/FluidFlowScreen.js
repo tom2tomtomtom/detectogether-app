@@ -191,6 +191,14 @@ const FluidFlowScreen = () => {
           </TouchableOpacity>
           
           <TouchableOpacity
+            style={[styles.actionButton, styles.photoButton]}
+            onPress={() => setShowPhotoCapture(true)}
+          >
+            <Icon name="camera" size={24} color="#8B5CF6" />
+            <Text style={[styles.actionButtonText, styles.photoButtonText]}>Photo Analysis</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.actionButton, styles.secondaryButton]}
             onPress={() => setShowPhotoGallery(true)}
           >
@@ -419,6 +427,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  photoButton: {
+    backgroundColor: '#8B5CF6',
+    marginTop: 12,
+  },
+  photoButtonText: {
+    color: '#FFFFFF',
   },
   secondaryButton: {
     backgroundColor: '#F3F4F6',
