@@ -9,6 +9,7 @@ const AccountScreen = ({ navigation }) => {
 
   const settingsOptions = [
     { icon: 'notifications', label: 'Notification Settings', onPress: () => navigation && navigation.navigate && navigation.navigate('NotificationSettings') },
+    { icon: 'cart', label: 'Pet Store', onPress: () => navigation && navigation.navigate && navigation.navigate('PetStore') },
     { icon: 'person', label: 'Personal Information', onPress: () => {} },
     { icon: 'paw', label: 'Pet Information', onPress: () => {} },
     { icon: 'lock-closed', label: 'Privacy & Data', onPress: () => {} },

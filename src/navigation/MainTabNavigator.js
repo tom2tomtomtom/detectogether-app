@@ -19,6 +19,7 @@ import MindRadarScreen from '../screens/MindRadarScreen';
 import DermalMapScreen from '../screens/DermalMapScreen';
 import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 import AchievementsScreen from '../screens/AchievementsScreen';
+import PetStoreScreen from '../screens/PetStoreScreen';
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -98,6 +99,7 @@ const ProfileStackScreen = () => (
   <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
     <ProfileStack.Screen name="ProfileScreen" component={AccountScreen} />
     <ProfileStack.Screen name="NotificationSettings" component={NotificationSettingsScreen} options={{ headerShown: true, title: 'Notification Settings' }} />
+    <ProfileStack.Screen name="PetStore" component={PetStoreScreen} options={{ headerShown: true, title: 'Pet Store' }} />
   </ProfileStack.Navigator>
 );
 

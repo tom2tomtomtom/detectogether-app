@@ -35,6 +35,10 @@ const useStore = create((set, get) => ({
     environment: 'starter_room',
     petEnvironmentLevel: 0,
     environmentUnlockDates: {},
+    customization: {
+      unlockedItems: { accessories: [], colors: ['default'], effects: [], environments: [] },
+      equippedItems: { accessory: null, color: 'default', effect: null, environment: null },
+    },
   },
   
   // Health Logs
@@ -183,6 +187,43 @@ const useStore = create((set, get) => ({
     if (total >= 100) get().unlockAchievement?.('credits_100_getting_started');
     if (total >= 500) get().unlockAchievement?.('credits_500_accessory');
     if (total >= 1000) get().unlockAchievement?.('credits_1000_env_upgrade');
+    get().saveData();
+  },
+
+  // Storefront: purchase and equip
+  purchaseItem: (itemType, itemId, cost) => {
+    set((state) => {
+      const pet = { ...state.pet };
+      const customization = { ...(pet.customization || {}) };
+      const unlocked = { ...(customization.unlockedItems || {}) };
+      const list = new Set(unlocked[itemType] || []);
+      if (list.has(itemId)) return {};
+      if ((pet.careCredits || 0) < cost) return {};
+      list.add(itemId);
+      unlocked[itemType] = Array.from(list);
+      customization.unlockedItems = unlocked;
+      // auto-equip first purchase in category
+      if (!customization.equippedItems[itemType === 'colors' ? 'color' : itemType.slice(0, -1)]) {
+        const key = itemType === 'colors' ? 'color' : itemType.slice(0, -1);
+        customization.equippedItems = { ...(customization.equippedItems || {}), [key]: itemId };
+      }
+      pet.customization = customization;
+      pet.careCredits = (pet.careCredits || 0) - cost;
+      return { pet };
+    });
+    get().saveData();
+  },
+  equipItem: (itemType, itemId) => {
+    set((state) => {
+      const pet = { ...state.pet };
+      const customization = { ...(pet.customization || {}) };
+      const unlocked = new Set(((customization.unlockedItems || {})[itemType] || []));
+      if (!unlocked.has(itemId)) return {};
+      const key = itemType === 'colors' ? 'color' : itemType.slice(0, -1);
+      customization.equippedItems = { ...(customization.equippedItems || {}), [key]: itemId };
+      pet.customization = customization;
+      return { pet };
+    });
     get().saveData();
   },
   updatePetStatus: (actionType) => {

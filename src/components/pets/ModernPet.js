@@ -61,8 +61,16 @@ function useBlink() {
   return eyeOpen;
 }
 
+import { useStore } from '../../store/useStore';
+
 export default function ModernPet({ petType = 'dog', mood = 'normal', size = 200, onPress }) {
-  const palette = PALETTES[petType] || PALETTES.dog;
+  const equippedColor = useStore((s) => s.pet.customization?.equippedItems?.color || 'default');
+  const paletteBase = PALETTES[petType] || PALETTES.dog;
+  const palette = equippedColor === 'midnight'
+    ? { ...paletteBase, start: '#E0E6EF', end: '#C9D4E3' }
+    : equippedColor === 'rose'
+    ? { ...paletteBase, start: '#FFE7EE', end: '#F8D7E2' }
+    : paletteBase;
 
   // Animations
   const breath = useSharedValue(0);
