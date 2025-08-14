@@ -1,9 +1,13 @@
 import React from 'react';
-import { View, ScrollView, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, SafeAreaView, TouchableOpacity, Linking } from 'react-native';
 import { colors, typography, spacing } from '../styles/theme';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useStore } from '../store/useStore';
 
 export default function AboutScreen({ navigation }) {
+  const streakDays = useStore((s) => s.achievements?.streakDays || 0);
+  const credits = useStore((s) => s.pet?.careCredits || 0);
+  const totalCredits = useStore((s) => s.pet?.totalCreditsEarned || 0);
   const sections = [
     {
       title: '🏠 Welcome to DetecTogether',
@@ -16,6 +20,10 @@ export default function AboutScreen({ navigation }) {
     {
       title: '💰 Earning Care Credits',
       content: 'Each log earns you credits:\n• Hydration: 10 credits\n• Energy: 10 credits\n• Gut check: 15 credits\n• Mind check: 10 credits\n• Skin scan: 25 credits'
+    },
+    {
+      title: '⏳ Health Decay (Tamagotchi-style)',
+      content: 'Your pet thrives on daily care. After a 6‑hour grace period, health decays about 2% per hour (up to −50%). Log any module to restore momentum.'
     },
     {
       title: '🏪 Pet Store',
@@ -46,6 +54,37 @@ export default function AboutScreen({ navigation }) {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Quick actions */}
+        <View style={styles.quickRow}>
+          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Profile', { screen: 'PetStore' })}>
+            <Icon name="pricetags" size={20} color={colors.primary} />
+            <Text style={styles.quickText}>Pet Store</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Stats', { screen: 'Neighborhood' })}>
+            <Icon name="people" size={20} color={colors.primary} />
+            <Text style={styles.quickText}>Neighborhood</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Profile', { screen: 'NotificationSettings' })}>
+            <Icon name="notifications" size={20} color={colors.primary} />
+            <Text style={styles.quickText}>Notifications</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Live stats */}
+        <View style={styles.statsCard}>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{streakDays}</Text>
+            <Text style={styles.statLabel}>Day Streak</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{credits}</Text>
+            <Text style={styles.statLabel}>Credits</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statValue}>{totalCredits}</Text>
+            <Text style={styles.statLabel}>All‑time</Text>
+          </View>
+        </View>
         {sections.map((section, index) => (
           <View key={index} style={styles.section}>
             <Text style={styles.sectionTitle}>{section.title}</Text>
@@ -53,7 +92,7 @@ export default function AboutScreen({ navigation }) {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.feedbackButton}>
+        <TouchableOpacity style={styles.feedbackButton} onPress={() => Linking.openURL('mailto:hello@detectogether.app?subject=Feedback') }>
           <Icon name="mail" size={20} color={colors.primary} />
           <Text style={styles.feedbackText}>Send Feedback</Text>
         </TouchableOpacity>
@@ -85,6 +124,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.md,
   },
+  quickRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  quickCard: {
+    flex: 1,
+    marginHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderRadius: 12,
+    paddingVertical: spacing.md,
+  },
+  quickText: { color: colors.primary, marginTop: 6, fontWeight: '600' },
+  statsCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 16,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  statItem: { alignItems: 'center', flex: 1 },
+  statValue: { fontSize: typography.lg, fontWeight: '700', color: colors.textPrimary },
+  statLabel: { fontSize: typography.sm, color: colors.textSecondary },
   section: {
     backgroundColor: 'rgba(255, 255, 255, 0.7)',
     borderRadius: 16,
