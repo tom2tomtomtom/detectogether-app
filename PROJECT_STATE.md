@@ -4,7 +4,7 @@
 - Name: DetecTogether App
 - Type: React Native Mobile App (Expo) with web-ready scaffolding
 - Size: ~7,000+ lines
-- Status: Phase 2 In Progress - Core features complete, gamification pending
+- Status: Phase 2 In Progress - Core features complete, gamification systems active
 
 ## Tech Stack
 - Frontend: React Native with Expo
@@ -13,7 +13,7 @@
 - UI Components: Custom components with React Native Vector Icons
 - Styling: Global Theme System (theme.js) with consistent design tokens
 - Storage: AsyncStorage for persistence
-- Animations: React Native Reanimated 2 (PetCharacter integrated)
+- Animations: React Native Reanimated 2 (ModernPet, PetHero ring, environment)
 - UI Libraries: React Native SVG, React Native Circular Progress
 
 ## Recent Sessions
@@ -28,7 +28,12 @@
 - Session 9: Major UI Redesign - Modern theme, simplified navigation, beautiful cards
 - Session 10: Persistent 4-tab navigation, Track stack holds health modules, FAB wired, nested nav fixes
 - Session 11: Module carousel on Home, SVG pets, UI improvements
-- Last Updated: 2025-08-14 (Evening)
+- Session 12: ModernPet (rounded), PetHero circular progress ring, jade theme
+- Session 13: Care Credits + combo, credit animations, Pet Store (purchase/equip)
+- Session 14: Module-specific vistas + HacksSection in all modules
+- Session 15: Weekly Missions (Stats → Missions), Stats overview population
+- Session 16: Evolving Pet Environment by streak + credits
+- Last Updated: 2025-08-14 (Night)
 
 ## Progress Tracking
 - [x] Project setup
@@ -48,9 +53,9 @@
 - [x] Achievement system (badges, progress, notifications)
 - [x] Module carousel on Home screen
 - [x] 4-tab navigation with good UX
-- [ ] Gamification elements (Care Credits, Pet Environment, Missions)
-- [ ] Module-specific vistas
-- [ ] Hacks sections (Tips, Marketplace, Education)
+- [x] Gamification elements (Care Credits, Pet Environment, Missions)
+- [x] Module-specific vistas
+- [x] Hacks sections (Tips, Marketplace, Education)
 - [ ] Photo capture/analysis
 - [ ] QR code scanning
 - [ ] Social features (Neighborhood)
@@ -75,11 +80,10 @@
    - Improved status cards layout
    - Health modules with gradients and "Log Now" buttons
    - Page indicators for carousel
-6. **Pet System**: 
-   - SVG-based pets (cat, dog, bunny, axolotl)
-   - Mood-based animations (happy/normal/sad/critical)
-   - Integrated in progress circle
-   - Still needs: ear attachment fix, richer animations
+ 6. **Pet System**: 
+    - ModernPet SVG with mood animations + tail/ear fixes
+    - PetEnvironment scenes (levels 0–4)
+    - Circular progress ring around pet
 7. **Onboarding**: Welcome, benefits, pet selection carousel, name pet, gating in `App.js`
 8. **Achievements**: Definitions, badge UI, progress + unlocks, points, moved to Stats screen
 9. **Notifications**: Expo service, smart scheduling, settings integrated into Profile
@@ -90,28 +94,18 @@
     - Warm color palette (#F5F0E8 background)
     - Module-specific color coding
     - MoodSelector component
-12. **New Screens**:
-    - TrackingHubScreen: Central hub for all health modules
-    - StatsScreen: Achievements and progress tracking
+ 12. **New Screens**:
+     - TrackingHubScreen (modules hub)
+     - StatsScreen (credits, streaks, achievements, missions preview)
+     - MissionsScreen (weekly quests)
+     - PetStoreScreen (buy/equip items)
 
 ## 🎯 REMAINING FROM BRIEF
 
 ### Gamification Elements (Priority 1)
-- [ ] **Care Credits System**
-  - Add points for each health action
-  - Display total in Stats/Profile
-  - Combo bonuses for multiple logs
-  - Visual feedback (+10 animation)
-- [ ] **Pet Environment Progression**
-  - Start: Simple white circle
-  - 7 days: Add grass/ground
-  - 14 days: Add trees/plants
-  - 30 days: Full park scene
-  - Store as petEnvironmentLevel
-- [ ] **Adventure Missions**
-  - Weekly challenges
-  - "Log 5 hydrations → unlock riverside walk"
-  - Progress bars for each mission
+- [x] **Care Credits System** (actions, combo, animations, Stats/Profile)
+- [x] **Pet Environment Progression** (levels 0–4, auto-upgrades by streak+credits)
+- [x] **Adventure Missions** (weekly templates, progress, claim rewards)
 - [ ] **Pet Moments/Memories**
   - Capture animations as collectible cards
   - Pin to vista as scrapbook
@@ -120,14 +114,14 @@
   - Community milestones
   - "Your street logged 10,000 points!"
 
-### Module Features (Priority 2)
-- [ ] **Module-Specific Vistas**
+-### Module Features (Priority 2)
+- [x] **Module-Specific Vistas**
   - Fluid Flow: Water garden with plants
   - Vitality: Sunrise with energy particles
   - Gut: Garden with soil/compost
   - Mind's Radar: Calm sky with curtains
   - Dermal Map: Mirror with soft lighting
-- [ ] **Hacks Section per Module**
+- [x] **Hacks Section per Module**
   - Tips & Tricks (swipeable cards)
   - Marketplace (product recommendations)
   - Education (curated articles)
@@ -143,11 +137,11 @@
   - Gut: Stool analysis (with privacy blur)
   - Dermal Map: Skin tracking photos
 
-### Quick Wins (Can do now)
-- [ ] Fix pet ear detachment in animations
-- [ ] Add circular progress ring on Home
-- [ ] Improve module card gradients
-- [ ] Add "last logged" timestamps
+### Quick Wins (Done)
+- [x] Fix pet ear detachment in animations
+- [x] Add circular progress ring on Home
+- [x] Improve module card gradients
+- [x] Add "last logged" timestamps
 
 ## 🎯 PHASE 2: Pet & Gamification (Current Focus - UPDATED)
 
