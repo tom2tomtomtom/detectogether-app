@@ -119,7 +119,8 @@ const HomeScreen = ({ navigation }) => {
   const isSmallScreen = screenHeight < 700;
   const ringSize = isSmallScreen ? 210 : 230;
   const circleSize = isSmallScreen ? 180 : 200;
-  const petPixel = isSmallScreen ? 155 : 170;
+  // Reduce pet size by ~33%
+  const petPixel = isSmallScreen ? 104 : 114;
 
   return (
     <View style={styles.container}>
