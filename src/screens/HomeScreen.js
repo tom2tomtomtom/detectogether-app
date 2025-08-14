@@ -127,6 +127,29 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const moduleShortNames = {
+    'Fluid Flow': 'Fluid',
+    "Mind's Radar": 'Mind',
+    'Gut Health': 'Gut',
+    'Dermal Map': 'Dermal',
+    'Vitality': 'Energy',
+  };
+
+  const formatTimeKey = (key) => {
+    const logs = healthLogs[key] || [];
+    if (!logs.length) return 'Start';
+    const ts = logs[logs.length - 1].timestamp;
+    const diffMs = Date.now() - new Date(ts).getTime();
+    const hours = diffMs / 3600000;
+    if (hours < 1) return 'Now';
+    if (hours < 24) return `${Math.floor(hours)}h`;
+    return `${Math.floor(hours / 24)}d`;
+  };
+
+  const handleModulePress = (m) => {
+    navigation.navigate('Track', { screen: m.route });
+  };
+
   const { height: screenHeight } = Dimensions.get('window');
   const isSmallScreen = screenHeight < 700;
   const ringSize = 190;
@@ -182,24 +205,24 @@ const HomeScreen = ({ navigation }) => {
 
           {/* Module Cards Grid (2x2) */}
           <View style={styles.moduleGrid}>
-            {modules.map((m) => (
-              <View key={m.id} style={styles.moduleWrapper}>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Track', { screen: m.route })}
-                  activeOpacity={0.9}
-                  style={[styles.cardBase, styles.moduleCard]}
-                >
-                  <View style={styles.moduleContent}>
-                    <View style={styles.moduleHeader}> 
-                      <Icon name={m.icon} size={24} color={m.color} />
-                      <Text style={styles.moduleName}>{m.title}</Text>
-                    </View>
-                    <Text style={styles.moduleStats}>{moduleStatValue(m.id)}</Text>
-                    <Text style={styles.lastLogged}>{formatSince(m.id === 'mind' ? 'headVision' : m.id)}</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            ))}
+            {modules.map((m) => {
+              const key = m.id === 'mind' ? 'headVision' : m.id;
+              const name = moduleShortNames[m.title] || m.title;
+              return (
+                <View key={m.id} style={styles.moduleWrapper}>
+                  <TouchableOpacity style={[styles.cardBase, styles.moduleCard]} onPress={() => handleModulePress(m)} activeOpacity={0.9}>
+                    {/* Icon */}
+                    <Icon name={m.icon} size={24} color={m.color} style={styles.moduleIcon} />
+                    {/* Name */}
+                    <Text style={styles.moduleName} numberOfLines={1}>{name}</Text>
+                    {/* Stat */}
+                    <Text style={styles.moduleStats} numberOfLines={1}>{moduleStatValue(m.id) || '—'}</Text>
+                    {/* Time */}
+                    <Text style={styles.lastLogged} numberOfLines={1}>{formatTimeKey(key)}</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
 
           {/* Removed bottom status grid; stats are now inside module cards */}
@@ -285,12 +308,18 @@ const styles = StyleSheet.create({
   creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
   moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 12 },
   moduleWrapper: { width: '31%', marginBottom: 12 },
-  moduleCard: { height: 110, width: '100%', overflow: 'hidden', padding: 12 },
-  moduleContent: { flex: 1, justifyContent: 'space-between' },
-  moduleHeader: { alignItems: 'center' },
-  moduleName: { fontSize: 14, fontWeight: '600', color: '#1F2937', marginTop: 4, textAlign: 'center' },
-  moduleStats: { fontSize: 18, fontWeight: 'bold', color: '#1F2937', textAlign: 'center' },
-  lastLogged: { fontSize: 11, color: '#6B7280', textAlign: 'center', marginBottom: 0 },
+  moduleCard: {
+    height: 105,
+    width: '100%',
+    overflow: 'hidden',
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moduleIcon: { fontSize: 24, marginBottom: 4, textAlign: 'center' },
+  moduleName: { fontSize: 13, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
+  moduleStats: { fontSize: 20, fontWeight: 'bold', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
+  lastLogged: { fontSize: 11, color: '#6B7280', textAlign: 'center' },
 });
 
 export default HomeScreen;
