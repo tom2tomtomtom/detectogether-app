@@ -6,9 +6,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useStore } from '../store/useStore';
 import { colors, borderRadius, spacing, typography, shadows } from '../styles/theme';
 
-const { width } = Dimensions.get('window');
-const CARD_WIDTH = 280;
-const CARD_HEIGHT = 160;
+const { width, height: screenHeight } = Dimensions.get('window');
+const isSmallScreen = screenHeight < 700;
+const CARD_HEIGHT = isSmallScreen ? 120 : 140;
+const CARD_WIDTH = Math.round((width - 32 - 20) / 2.2);
 const GAP = 10;
 
 const moduleIdToStoreKey = {
@@ -51,7 +52,7 @@ export default function ModuleCarousel({ modules }) {
         ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={290}
+        snapToInterval={CARD_WIDTH + GAP}
         decelerationRate="fast"
         contentContainerStyle={{ paddingHorizontal: spacing.lg }}
         onScroll={(e) => {
@@ -68,9 +69,9 @@ export default function ModuleCarousel({ modules }) {
 
             {/* Content */}
             <View style={styles.cardInner}>
-              <View style={styles.rowCenter}>
+               <View style={styles.rowCenter}>
                 <View style={[styles.iconWrap, { backgroundColor: m.lightColor }]}> 
-                  <Icon name={m.icon} size={32} color={m.color} />
+                  <Icon name={m.icon} size={24} color={m.color} />
                 </View>
                 <Text style={styles.cardTitle}>{m.title}</Text>
               </View>
@@ -95,7 +96,7 @@ export default function ModuleCarousel({ modules }) {
 }
 
 const styles = StyleSheet.create({
-  container: { marginTop: spacing.xl },
+  container: { marginTop: 12 },
   card: {
     borderRadius: 20,
     overflow: 'hidden',
@@ -109,13 +110,13 @@ const styles = StyleSheet.create({
   cardInner: { flex: 1, padding: 16 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   rowCenter: { flexDirection: 'row', alignItems: 'center' },
-  iconWrap: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: colors.textPrimary },
-  timeText: { fontSize: 13, color: colors.textSecondary, marginTop: 4 },
-  vistaTop: { height: 60 },
-  logBtnFull: { height: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },
-  logBtnText: { color: colors.textWhite, fontWeight: '700', fontSize: 14 },
-  dots: { flexDirection: 'row', justifyContent: 'center', marginTop: spacing.sm },
+  iconWrap: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  cardTitle: { fontSize: 16, fontWeight: '700', color: colors.textPrimary },
+  timeText: { fontSize: 12, color: colors.textSecondary, marginTop: 2 },
+  vistaTop: { height: 50 },
+  logBtnFull: { height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary },
+  logBtnText: { color: colors.textWhite, fontWeight: '700', fontSize: 13 },
+  dots: { flexDirection: 'row', justifyContent: 'center', marginTop: 8 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#DAD8F8', marginHorizontal: 4 },
   dotActive: { backgroundColor: colors.primary },
 });

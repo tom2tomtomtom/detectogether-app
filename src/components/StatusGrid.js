@@ -13,14 +13,10 @@ export default function StatusGrid({ data = {}, onPress }) {
   return (
     <View style={styles.grid}>
       {rows.map((r) => (
-        <TouchableOpacity key={r.id} style={styles.card} activeOpacity={0.9} onPress={() => onPress?.(r.id)}>
-          <View style={[styles.iconCircle, { backgroundColor: r.color }]}>
-            <Text style={styles.icon}>{r.icon}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.value}>{String(data[r.valueKey] ?? '--')}</Text>
-            <Text style={styles.label}>{r.label}</Text>
-          </View>
+        <TouchableOpacity key={r.id} style={styles.cell} activeOpacity={0.8} onPress={() => onPress?.(r.id)}>
+          <Text style={styles.cellIcon}>{r.icon}</Text>
+          <Text style={styles.cellValue}>{String(data[r.valueKey] ?? '--')}</Text>
+          <Text style={styles.cellLabel}>{r.label}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -31,30 +27,23 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    rowGap: 12,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  card: {
-    width: '48%',
-    height: 80,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    ...shadows.sm,
-  },
-  iconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  cell: {
+    width: '50%',
+    height: 70,
+    padding: 8,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#E5E7EB',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
   },
-  icon: { fontSize: 28 },
-  value: { fontSize: 18, fontWeight: '700', color: colors.textPrimary },
-  label: { fontSize: 14, color: colors.textSecondary },
+  cellIcon: { fontSize: 18, marginBottom: 2 },
+  cellValue: { fontSize: 16, fontWeight: '700', color: colors.textPrimary },
+  cellLabel: { fontSize: 12, color: colors.textSecondary },
 });
 
 

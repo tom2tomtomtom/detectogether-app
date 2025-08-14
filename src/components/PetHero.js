@@ -11,14 +11,23 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PanGestureHandler, TapGestureHandler, LongPressGestureHandler } from 'react-native-gesture-handler';
 import PetCharacter from './PetCharacter';
-import PetEnvironment from './PetEnvironment';
+// import PetEnvironment from './PetEnvironment';
 import { useStore } from '../store/useStore';
 import Svg, { Defs, LinearGradient, Stop, Circle } from 'react-native-svg';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-export default function PetHero({ healthScore = 50, size = 240, petSize = 200, petType }) {
-  const envLevel = useStore((s) => s.pet.petEnvironmentLevel || 0);
+export default function PetHero({
+  healthScore = 50,
+  // Outer progress ring diameter
+  ringSize = 190,
+  // Static white circle background diameter
+  circleSize = 180,
+  // Pet character size
+  petPixel = 140,
+  petType,
+}) {
+  // const envLevel = useStore((s) => s.pet.petEnvironmentLevel || 0);
   const animatedScale = useSharedValue(1);
   const animatedY = useSharedValue(0);
   const rotateZ = useSharedValue(0);
@@ -66,10 +75,9 @@ export default function PetHero({ healthScore = 50, size = 240, petSize = 200, p
     <LongPressGestureHandler onActivated={onLongPress} minDurationMs={500}>
       <TapGestureHandler onActivated={onTap}>
         <PanGestureHandler onEnded={onSwipeEnd}>
-          <View style={{ width: size + 20, height: size + 20, alignItems: 'center', justifyContent: 'center' }}>
-            {/* Circular progress ring */}
+          <View style={{ width: ringSize, height: ringSize, alignItems: 'center', justifyContent: 'center' }}>
+            {/* Circular progress ring - STATIC */}
             {(() => {
-              const ringSize = size + 20; // 260 when size=240
               const stroke = 10;
               const r = ringSize / 2 - stroke / 2;
               const cx = ringSize / 2;
@@ -86,27 +94,35 @@ export default function PetHero({ healthScore = 50, size = 240, petSize = 200, p
                     </LinearGradient>
                   </Defs>
                   <Circle cx={cx} cy={cy} r={r} stroke="rgba(88,86,214,0.1)" strokeWidth={stroke} fill="none" />
-                  <Circle
-                    cx={cx}
-                    cy={cy}
-                    r={r}
-                    stroke="url(#grad)"
-                    strokeWidth={stroke}
-                    fill="none"
-                    strokeDasharray={dash}
-                    strokeLinecap="round"
-                    transform={`rotate(-90 ${cx} ${cy})`}
-                  />
+                  <Circle cx={cx} cy={cy} r={r} stroke="url(#grad)" strokeWidth={stroke} fill="none" strokeDasharray={dash} strokeLinecap="round" transform={`rotate(-90 ${cx} ${cy})`} />
                 </Svg>
               );
             })()}
 
-            {/* Pet environment */}
-            <Animated.View style={animatedStyle}>
-              <PetEnvironment level={envLevel} size={size} petSize={petSize} petType={petType || 'dog'} healthScore={healthScore} />
-            </Animated.View>
-            {/* Inner percentage at bottom */}
-            <Text style={{ position: 'absolute', bottom: 20, fontSize: 32, fontWeight: '700', color: '#5856D6' }}>{Math.round(healthScore)}%</Text>
+            {/* White circle background - STATIC */}
+            <View
+              style={{
+                width: circleSize,
+                height: circleSize,
+                borderRadius: circleSize / 2,
+                backgroundColor: '#FFFFFF',
+                shadowColor: '#000',
+                shadowOpacity: 0.1,
+                shadowRadius: 20,
+                shadowOffset: { width: 0, height: 10 },
+                elevation: 6,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {/* Only animate the inner pet */}
+              <Animated.View style={animatedStyle}>
+                <PetCharacter petType={petType} healthScore={healthScore} size={petPixel} />
+              </Animated.View>
+            </View>
+
+            {/* Percentage text - STATIC */}
+            <Text style={{ position: 'absolute', bottom: 4, fontSize: 24, fontWeight: '700', color: '#5856D6' }}>{Math.round(healthScore)}%</Text>
           </View>
         </PanGestureHandler>
       </TapGestureHandler>

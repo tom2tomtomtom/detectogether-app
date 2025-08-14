@@ -90,15 +90,18 @@ const HomeScreen = ({ navigation }) => {
     return 'Your pet needs attention';
   }, [overallScore]);
 
+  const { height: screenHeight } = Dimensions.get('window');
+  const isSmallScreen = screenHeight < 700;
+  const ringSize = 190;
+  const circleSize = isSmallScreen ? 160 : 180;
+  const petPixel = 140;
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView 
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Greeting + mini mood dots */}
-          <View style={styles.greetingRow}>
+          <View style={[styles.greetingRow, { marginBottom: 12 }]}>
             <Text style={styles.greetingSmall}>Good {getTimeOfDay()}, {user.name || 'Friend'}!</Text>
             <View style={styles.moodDots}>
               {[1,2,3,4,5].map((m) => (
@@ -108,8 +111,8 @@ const HomeScreen = ({ navigation }) => {
           </View>
 
           {/* Pet Hero Section */}
-          <View style={styles.heroSection}>
-            <PetHero healthScore={overallScore} petType={user.petType || 'dog'} size={240} petSize={200} />
+          <View style={[styles.heroSection, { marginBottom: 16 }]}>
+            <PetHero healthScore={overallScore} petType={user.petType || 'dog'} ringSize={ringSize} circleSize={circleSize} petPixel={petPixel} />
             {/* Care credits badge */}
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
               <Text style={{ fontSize: 16 }}>🪙</Text>
@@ -117,14 +120,14 @@ const HomeScreen = ({ navigation }) => {
             </View>
 
           {/* Status text */}
-          <Text style={[styles.statusText, { marginTop: 16 }]}>{statusText}</Text>
+          <Text style={[styles.statusText, { marginTop: 12 }]}>{statusText}</Text>
           </View>
 
           {/* Neighborhood widget */}
           <TouchableOpacity
             onPress={() => navigation.navigate('Stats', { screen: 'Neighborhood' })}
             activeOpacity={0.9}
-            style={styles.neighborhoodCard}
+            style={[styles.neighborhoodCard, { height: 80 }]}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Text style={styles.neighborhoodTitle}>Neighborhood</Text>
@@ -133,7 +136,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.neighborhoodBarTrack}>
               <View style={[styles.neighborhoodBarFill, { width: '50%' }]} />
             </View>
-            <Text style={styles.neighborhoodMeta}>Tap to visit →</Text>
+            <Text style={[styles.neighborhoodMeta, { fontSize: 14 }]}>Tap to visit →</Text>
           </TouchableOpacity>
 
           {/* Module Carousel */}
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: 120,
+    paddingBottom: 32,
   },
   greetingRow: {
     marginTop: spacing.lg,
@@ -196,10 +199,7 @@ const styles = StyleSheet.create({
   moodDotActive: {
     backgroundColor: '#5856D6',
   },
-  heroSection: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
+  heroSection: { alignItems: 'center' },
   healthPercent: {
     marginTop: spacing.lg,
     fontSize: 48,
