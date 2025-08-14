@@ -8,7 +8,7 @@ import {
   Dimensions,
   Platform
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { Camera, CameraType, FlashMode } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { BlurView } from 'expo-blur';
@@ -27,7 +27,7 @@ const PhotoCapture = ({
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [showBlur, setShowBlur] = useState(false);
-  const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
+  const [flashMode, setFlashMode] = useState(FlashMode.off);
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -96,11 +96,7 @@ const PhotoCapture = ({
   };
 
   const toggleFlash = () => {
-    setFlashMode(
-      flashMode === Camera.Constants.FlashMode.off
-        ? Camera.Constants.FlashMode.on
-        : Camera.Constants.FlashMode.off
-    );
+    setFlashMode((prev) => (prev === FlashMode.off ? FlashMode.on : FlashMode.off));
   };
 
   const getAnalysisOverlay = () => {
@@ -169,7 +165,7 @@ const PhotoCapture = ({
           <Camera
             ref={cameraRef}
             style={styles.camera}
-            type={Camera.Constants.Type.back}
+            type={CameraType.back}
             flashMode={flashMode}
             onCameraReady={() => setCameraReady(true)}
             ratio="4:3"
@@ -207,9 +203,7 @@ const PhotoCapture = ({
             </Text>
 
             <TouchableOpacity style={styles.controlButton} onPress={toggleFlash}>
-              <Text style={styles.controlText}>
-                {flashMode === Camera.Constants.FlashMode.off ? '🔦' : '💡'}
-              </Text>
+              <Text style={styles.controlText}>{flashMode === FlashMode.off ? '🔦' : '💡'}</Text>
             </TouchableOpacity>
           </View>
 
