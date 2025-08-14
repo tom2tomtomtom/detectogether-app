@@ -75,7 +75,7 @@ export default function PetHero({
     <LongPressGestureHandler onActivated={onLongPress} minDurationMs={500}>
       <TapGestureHandler onActivated={onTap}>
         <PanGestureHandler onEnded={onSwipeEnd}>
-          <View style={{ width: ringSize, height: ringSize + 24, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: ringSize, height: ringSize, alignItems: 'center', justifyContent: 'center' }}>
             {/* Circular progress ring - STATIC */}
             {(() => {
               const stroke = 10;
@@ -121,9 +121,9 @@ export default function PetHero({
               </Animated.View>
             </View>
 
-            {/* Percentage text - STATIC (slightly outside ring) */}
-            <Text style={{ position: 'absolute', bottom: 0, fontSize: 24, fontWeight: '700', color: '#5856D6' }}>{Math.round(healthScore)}%</Text>
           </View>
+          {/* Percentage text - STATIC, below the ring */}
+          <Text style={{ marginTop: 6, fontSize: 26, fontWeight: '800', color: '#5856D6' }}>{Math.round(healthScore)}%</Text>
         </PanGestureHandler>
       </TapGestureHandler>
     </LongPressGestureHandler>
