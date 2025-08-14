@@ -38,7 +38,19 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     <View style={styles.tabBar}>
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
-        const onPress = () => !isFocused && navigation.navigate(route.name);
+        const onPress = () => {
+          const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+          if (event.defaultPrevented) return;
+          // Map tab to its root screen
+          const targetScreen = route.name === 'Track'
+            ? 'TrackingHub'
+            : route.name === 'Stats'
+            ? 'StatsScreen'
+            : route.name === 'Profile'
+            ? 'ProfileScreen'
+            : 'HomeScreen';
+          navigation.navigate(route.name, { screen: targetScreen });
+        };
         return (
           <TouchableOpacity
             key={route.key}
@@ -106,29 +118,16 @@ const MainTabNavigator = () => {
     <View style={{ flex: 1 }}>
       <Tab.Navigator
         tabBar={(props) => <CustomTabBar {...props} />}
-        screenOptions={{ headerShown: false, unmountOnBlur: true }}
-        screenListeners={({ navigation, route }) => ({
-          tabPress: (e) => {
-            // Always navigate to root of the tapped stack
-            e.preventDefault();
-            const targetScreen = route.name === 'Track'
-              ? 'TrackingHub'
-              : route.name === 'Stats'
-              ? 'StatsScreen'
-              : route.name === 'Profile'
-              ? 'ProfileScreen'
-              : 'HomeScreen';
-            navigation.navigate(route.name, { screen: targetScreen, params: { reset: true } });
-          },
-        })}
+        screenOptions={{ headerShown: false }}
       >
-        <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Track" component={TrackStackScreen} />
+        <Tab.Screen name="Home" component={HomeStackScreen} options={{ unmountOnBlur: true }} />
+        <Tab.Screen name="Track" component={TrackStackScreen} options={{ unmountOnBlur: true }} />
         <Tab.Screen
           name="Stats"
           component={StatsStackScreen}
+          options={{ unmountOnBlur: true }}
         />
-        <Tab.Screen name="Profile" component={ProfileStackScreen} />
+        <Tab.Screen name="Profile" component={ProfileStackScreen} options={{ unmountOnBlur: true }} />
       </Tab.Navigator>
     </View>
   );
