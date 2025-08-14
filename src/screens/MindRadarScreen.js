@@ -59,12 +59,10 @@ const MindRadarScreen = () => {
     });
     setShowStressModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
-    addCredits(10, 'mind:status');
-    const now = Date.now();
-    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
-    const earned = combo ? 20 : 10;
+    // addCredits already happens in addHealthLog
+    const earned = 10;
     const { width } = Dimensions.get('window');
-    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
   };
 
   const handleCheckinQuickLog = (item) => {
@@ -73,12 +71,9 @@ const MindRadarScreen = () => {
       time: item.id,
     });
     Alert.alert('Noted!', `${item.label}`);
-    addCredits(10, 'mind:checkin');
-    const now = Date.now();
-    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
-    const earned = combo ? 20 : 10;
+    const earned = 10;
     const { width } = Dimensions.get('window');
-    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
   };
 
   const openCheckinModal = () => {
@@ -99,12 +94,9 @@ const MindRadarScreen = () => {
     setShowCheckinModal(false);
     setSelectedCheckin(null);
     Alert.alert('Logged!', `${selectedCheckin.label} • Mind: ${feeling}`);
-    addCredits(10, 'mind:checkin+feeling');
-    const now = Date.now();
-    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
-    const earned = combo ? 20 : 10;
+    const earned = 10;
     const { width } = Dimensions.get('window');
-    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
   };
 
   const getTodayLogs = () => {

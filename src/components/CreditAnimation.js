@@ -7,8 +7,12 @@ export default function CreditAnimation({ amount = 10, x = 0, y = 0, combo = fal
   const op = useSharedValue(1);
 
   useEffect(() => {
-    ty.value = withTiming(-50, { duration: 1000 }, () => onEnd?.());
+    ty.value = withTiming(-50, { duration: 1000 });
     op.value = withTiming(0, { duration: 1000 });
+    const timer = setTimeout(() => {
+      try { onEnd?.(); } catch (_) {}
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const style = useAnimatedStyle(() => ({ transform: [{ translateY: ty.value }], opacity: op.value }));

@@ -51,12 +51,10 @@ const FluidFlowScreen = () => {
     });
     setShowColorModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
-    const now = Date.now();
-    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
-    const earned = combo ? 20 : 10;
-    addCredits(10, 'hydration:color', combo);
+    // addCredits is called inside addHealthLog; just show a visual burst
+    const earned = 10; // combo handled internally
     const { width } = Dimensions.get('window');
-    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
   };
 
   const handleHydrationLog = (amount) => {
@@ -66,12 +64,9 @@ const FluidFlowScreen = () => {
       unit: 'oz',
     });
     Alert.alert('Great job!', `${amount}oz logged! Your garden is thriving.`);
-    const now = Date.now();
-    const combo = lastLogTime && now - lastLogTime <= 5 * 60 * 1000;
-    const earned = combo ? 20 : 10;
-    addCredits(10, 'hydration:intake', combo);
+    const earned = 10; // combo handled internally
     const { width } = Dimensions.get('window');
-    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
+    setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
   };
 
   const getTodayLogs = () => {

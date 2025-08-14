@@ -476,21 +476,30 @@ const useStore = create((set, get) => ({
     try {
       if (__persistTimer) clearTimeout(__persistTimer);
       __persistTimer = setTimeout(async () => {
-        const state = get();
-        const dataToSave = {
-          user: state.user,
-          pet: state.pet,
-          healthLogs: state.healthLogs,
-          achievements: state.achievements,
-          notifications: state.notifications,
-          activeMissions: state.activeMissions,
-          completedMissions: state.completedMissions,
-          missionProgress: state.missionProgress,
-        };
-        await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
+        try {
+          const state = get();
+          const dataToSave = {
+            user: state.user,
+            pet: {
+              ...state.pet,
+              lastLogTime: state.pet.lastLogTime || 0,
+              creditHistory: (state.pet.creditHistory || []).slice(-50),
+            },
+            healthLogs: state.healthLogs,
+            achievements: { ...state.achievements, lastLogDate: state.achievements.lastLogDate || null },
+            notifications: state.notifications,
+            activeMissions: state.activeMissions || [],
+            completedMissions: state.completedMissions || [],
+            missionProgress: state.missionProgress || {},
+          };
+          const jsonString = JSON.stringify(dataToSave);
+          await AsyncStorage.setItem('userData', jsonString);
+        } catch (saveError) {
+          console.error('AsyncStorage save error:', saveError);
+        }
       }, 250);
     } catch (error) {
-      console.error('Error saving user data (debounced):', error);
+      console.error('SaveData wrapper error:', error);
     }
   },
   refreshWeeklyMissions: () => {
