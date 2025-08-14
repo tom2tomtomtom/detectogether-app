@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import PetHero from '../components/PetHero';
 import ModuleCarousel from '../components/ModuleCarousel';
 import StatusGrid from '../components/StatusGrid';
+import { useNavigation } from '@react-navigation/native';
 import CreditAnimation from '../components/CreditAnimation';
 import { useStore } from '../store/useStore';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
@@ -119,6 +120,22 @@ const HomeScreen = ({ navigation }) => {
           <Text style={[styles.statusText, { marginTop: 16 }]}>{statusText}</Text>
           </View>
 
+          {/* Neighborhood widget */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Stats', { screen: 'Neighborhood' })}
+            activeOpacity={0.9}
+            style={styles.neighborhoodCard}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.neighborhoodTitle}>Neighborhood</Text>
+              {/* For simplicity, omit active count in this version */}
+            </View>
+            <View style={styles.neighborhoodBarTrack}>
+              <View style={[styles.neighborhoodBarFill, { width: '50%' }]} />
+            </View>
+            <Text style={styles.neighborhoodMeta}>Tap to visit →</Text>
+          </TouchableOpacity>
+
           {/* Module Carousel */}
           <ModuleCarousel modules={modules} />
 
@@ -195,6 +212,11 @@ const styles = StyleSheet.create({
     fontSize: typography.md,
     color: colors.textSecondary,
   },
+  neighborhoodCard: { backgroundColor: '#FFFFFF', borderRadius: 14, padding: spacing.md, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 2, marginBottom: spacing.md },
+  neighborhoodTitle: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
+  neighborhoodBarTrack: { height: 8, backgroundColor: '#E0F2F1', borderRadius: 999, overflow: 'hidden', marginTop: 8 },
+  neighborhoodBarFill: { height: '100%', backgroundColor: '#10B981' },
+  neighborhoodMeta: { marginTop: 6, color: colors.textSecondary, fontWeight: '700' },
   miniRow: {
     marginTop: 24,
   },
