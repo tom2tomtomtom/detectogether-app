@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import HacksSection from '../components/HacksSection';
 
 const FluidFlowScreen = () => {
   const [showColorModal, setShowColorModal] = useState(false);
@@ -184,6 +185,7 @@ const FluidFlowScreen = () => {
             </ScrollView>
           </View>
         </View>
+        <HacksSection moduleType="fluid" />
       </ScrollView>
       {creditBurst && (
         <CreditAnimation

@@ -203,8 +203,9 @@ const useStore = create((set, get) => ({
       unlocked[itemType] = Array.from(list);
       customization.unlockedItems = unlocked;
       // auto-equip first purchase in category
-      if (!customization.equippedItems[itemType === 'colors' ? 'color' : itemType.slice(0, -1)]) {
-        const key = itemType === 'colors' ? 'color' : itemType.slice(0, -1);
+      const toKey = (t) => (t === 'colors' ? 'color' : t === 'accessories' ? 'accessory' : t === 'effects' ? 'effect' : t === 'environments' ? 'environment' : t);
+      const equipKey = toKey(itemType);
+      if (!customization.equippedItems[equipKey]) {
         customization.equippedItems = { ...(customization.equippedItems || {}), [key]: itemId };
       }
       pet.customization = customization;
@@ -219,7 +220,7 @@ const useStore = create((set, get) => ({
       const customization = { ...(pet.customization || {}) };
       const unlocked = new Set(((customization.unlockedItems || {})[itemType] || []));
       if (!unlocked.has(itemId)) return {};
-      const key = itemType === 'colors' ? 'color' : itemType.slice(0, -1);
+      const key = itemType === 'colors' ? 'color' : itemType === 'accessories' ? 'accessory' : itemType === 'effects' ? 'effect' : itemType === 'environments' ? 'environment' : itemType;
       customization.equippedItems = { ...(customization.equippedItems || {}), [key]: itemId };
       pet.customization = customization;
       return { pet };

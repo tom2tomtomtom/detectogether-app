@@ -65,6 +65,7 @@ import { useStore } from '../../store/useStore';
 
 export default function ModernPet({ petType = 'dog', mood = 'normal', size = 200, onPress }) {
   const equippedColor = useStore((s) => s.pet.customization?.equippedItems?.color || 'default');
+  const unlockedAccessories = useStore((s) => s.pet.customization?.unlockedItems?.accessories || []);
   const paletteBase = PALETTES[petType] || PALETTES.dog;
   const palette = equippedColor === 'midnight'
     ? { ...paletteBase, start: '#E0E6EF', end: '#C9D4E3' }
@@ -153,6 +154,14 @@ export default function ModernPet({ petType = 'dog', mood = 'normal', size = 200
   const bodyH = 110;
   const tailBaseX = bodyX + bodyW; // 160
   const tailBaseY = bodyY + bodyH / 2; // 95
+  // Facial anchors for consistent accessory placement
+  const eyeLeftX = 85;
+  const eyeRightX = 115;
+  const eyeY = 88;
+  const noseX = 100;
+  const noseY = 106;
+  const neckY = 116;
+  const headTopY = 40; // approximate top of head/ears region
 
   return (
     <Pressable onPress={onTap} hitSlop={16}>
@@ -194,15 +203,45 @@ export default function ModernPet({ petType = 'dog', mood = 'normal', size = 200
 
             {/* Eyes */}
             <G>
-              <Circle cx={85} cy={88} r={10} fill="#fff" />
-              <AnimatedCircle cx={85} cy={88} r={6} fill="#2B2B2B" animatedProps={eyeAnimatedProps} />
-              <Circle cx={115} cy={88} r={10} fill="#fff" />
-              <AnimatedCircle cx={115} cy={88} r={6} fill="#2B2B2B" animatedProps={eyeAnimatedProps} />
+              <Circle cx={eyeLeftX} cy={eyeY} r={10} fill="#fff" />
+              <AnimatedCircle cx={eyeLeftX} cy={eyeY} r={6} fill="#2B2B2B" animatedProps={eyeAnimatedProps} />
+              <Circle cx={eyeRightX} cy={eyeY} r={10} fill="#fff" />
+              <AnimatedCircle cx={eyeRightX} cy={eyeY} r={6} fill="#2B2B2B" animatedProps={eyeAnimatedProps} />
             </G>
 
             {/* Nose/Mouth */}
-            <Circle cx={100} cy={106} r={3.5} fill="#333" />
-            <Path d="M96 112 q 4 4 8 0" stroke="#333" strokeWidth={3} strokeLinecap="round" fill="none" />
+            <Circle cx={noseX} cy={noseY} r={3.5} fill="#333" />
+            <Path d={`M${noseX - 4} ${noseY + 6} q 4 4 8 0`} stroke="#333" strokeWidth={3} strokeLinecap="round" fill="none" />
+
+            {/* Accessories overlay (render all owned accessories together) */}
+            {unlockedAccessories.map((acc) => {
+              if (acc === 'bowtie') {
+                return <Path key={acc} d={`M${noseX - 12} ${neckY} l-10 8 l10 8 l6 -5 l6 5 l10 -8 l-10 -8 l-6 5 z`} fill="#E91E63" opacity={0.95} />;
+              }
+              if (acc === 'hat') {
+                return (
+                  <G key={acc}>
+                    {/* brim atop head */}
+                    <Path d={`M${noseX - 28} ${headTopY + 4} h56 v10 h-56 z`} fill="#6D4C41" opacity={0.95} />
+                    {/* crown above brim */}
+                    <Path d={`M${noseX - 14} ${headTopY - 10} h28 v14 h-28 z`} fill="#8D6E63" />
+                  </G>
+                );
+              }
+              if (acc === 'glasses') {
+                return (
+                  <G key={acc}>
+                    <Circle cx={eyeLeftX} cy={eyeY} r={9} stroke="#000" strokeWidth={2} fill="none" />
+                    <Circle cx={eyeRightX} cy={eyeY} r={9} stroke="#000" strokeWidth={2} fill="none" />
+                    <Path d={`M${eyeLeftX + 8} ${eyeY} h${eyeRightX - eyeLeftX - 16}`} stroke="#000" strokeWidth={2} />
+                  </G>
+                );
+              }
+              if (acc === 'crown') {
+                return <Path key={acc} d={`M${noseX - 12} ${headTopY - 6} l6 -10 l6 10 l6 -10 l6 10 v8 h-24 z`} fill="#FBC02D" stroke="#F57F17" strokeWidth={2} />;
+              }
+              return null;
+            })}
           </AnimatedG>
         </Svg>
       </View>

@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import HacksSection from '../components/HacksSection';
 
 const GutScreen = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -215,6 +216,7 @@ const GutScreen = () => {
             </ScrollView>
           </View>
         </View>
+        <HacksSection moduleType="gut" />
       </ScrollView>
       {creditBurst && (
         <CreditAnimation

@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import HacksSection from '../components/HacksSection';
 
 const MindRadarScreen = () => {
   const [showStressModal, setShowStressModal] = useState(false);
@@ -220,6 +221,7 @@ const MindRadarScreen = () => {
             </ScrollView>
           </View>
         </View>
+        <HacksSection moduleType="mind" />
       </ScrollView>
       {creditBurst && (
         <CreditAnimation

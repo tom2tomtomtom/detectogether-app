@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import HacksSection from '../components/HacksSection';
 
 const DermalMapScreen = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -223,6 +224,7 @@ const DermalMapScreen = () => {
             </ScrollView>
           </View>
         </View>
+        <HacksSection moduleType="dermal" />
       </ScrollView>
       {creditBurst && (
         <CreditAnimation
