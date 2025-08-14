@@ -33,6 +33,10 @@ const PhotoCapture = ({
   const FLASH_ON = Camera?.Constants?.FlashMode?.on ?? FlashMode?.on ?? null;
   const supportsFlash = FLASH_OFF !== null && FLASH_ON !== null;
   const [flashMode, setFlashMode] = useState(FLASH_OFF);
+
+  // Determine camera type across SDKs; omit prop if not available
+  const TYPE_BACK = Camera?.Constants?.Type?.back ?? Camera?.Type?.back ?? CameraType?.back ?? null;
+  const supportsType = TYPE_BACK !== null;
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -180,7 +184,7 @@ const PhotoCapture = ({
           <Camera
             ref={cameraRef}
             style={styles.camera}
-            type={CameraType.back}
+            {...(supportsType ? { type: TYPE_BACK } : {})}
             {...(supportsFlash && flashMode != null ? { flashMode } : {})}
             onCameraReady={() => setCameraReady(true)}
             ratio="4:3"
