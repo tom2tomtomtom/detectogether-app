@@ -11,10 +11,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import PetHero from '../components/PetHero';
-import ModuleCarousel from '../components/ModuleCarousel';
-import StatusGrid from '../components/StatusGrid';
-import { useNavigation } from '@react-navigation/native';
-import CreditAnimation from '../components/CreditAnimation';
+import Icon from 'react-native-vector-icons/Ionicons';
+// Removed carousel and bottom grid in favor of compact module cards
 import { useStore } from '../store/useStore';
 import { colors, spacing, borderRadius, typography, shadows } from '../styles/theme';
 
@@ -90,6 +88,41 @@ const HomeScreen = ({ navigation }) => {
     return 'Your pet needs attention';
   }, [overallScore]);
 
+  // Helpers for module stats
+  const healthLogs = useStore((s) => s.healthLogs);
+  const getLastLogTime = (key) => {
+    const logs = healthLogs[key] || [];
+    if (!logs.length) return 'No logs yet';
+    const diffMs = Date.now() - new Date(logs[logs.length - 1].timestamp).getTime();
+    const hrs = Math.max(1, Math.floor(diffMs / 3600000));
+    return `${hrs}h ago`;
+  };
+  const getToday = () => new Date().toDateString();
+  const getHydrationToday = () => {
+    const logs = (healthLogs.hydration || []).filter((l) => new Date(l.timestamp).toDateString() === getToday() && l.type === 'intake');
+    const totalOz = logs.reduce((sum, l) => sum + (l.amount || 0), 0);
+    const liters = Math.round((totalOz * 0.0295735) * 100) / 100;
+    return `${liters}L`;
+  };
+  const moduleStatValue = (id) => {
+    switch (id) {
+      case 'hydration':
+        return getHydrationToday();
+      case 'energy':
+        return `${pet.energy}%`;
+      case 'gut': {
+        const today = (healthLogs.gut || []).filter((l) => new Date(l.timestamp).toDateString() === getToday());
+        return `${today.length} logs`;
+      }
+      case 'mind':
+        return selectedMood >= 4 ? 'Good' : selectedMood === 3 ? 'OK' : 'Low';
+      case 'skin':
+        return '—';
+      default:
+        return '—';
+    }
+  };
+
   const { height: screenHeight } = Dimensions.get('window');
   const isSmallScreen = screenHeight < 700;
   const ringSize = 190;
@@ -114,10 +147,14 @@ const HomeScreen = ({ navigation }) => {
           <View style={[styles.heroSection, { marginBottom: 16 }]}>
             <PetHero healthScore={overallScore} petType={user.petType || 'dog'} ringSize={ringSize} circleSize={circleSize} petPixel={petPixel} />
             {/* Care credits badge */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-              <Text style={{ fontSize: 16 }}>🪙</Text>
-              <Text style={{ marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#2E7D32' }}>{pet.careCredits || 0}</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.creditsButton}
+              onPress={() => navigation.navigate('Profile', { screen: 'PetStore' })}
+              activeOpacity={0.9}
+            >
+              <Icon name="wallet" size={16} color="#666" />
+              <Text style={styles.creditsText}>{pet.careCredits || 0}</Text>
+            </TouchableOpacity>
 
           {/* Status text */}
           <Text style={[styles.statusText, { marginTop: 12 }]}>{statusText}</Text>
@@ -127,34 +164,45 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => navigation.navigate('Stats', { screen: 'Neighborhood' })}
             activeOpacity={0.9}
-            style={[styles.neighborhoodCard, { height: 80 }]}
+            style={[styles.cardBase, styles.neighborhoodCard]}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <Text style={styles.neighborhoodTitle}>Neighborhood</Text>
-              {/* For simplicity, omit active count in this version */}
+              <Icon name="chevron-forward" size={18} color="#6B7280" />
             </View>
             <View style={styles.neighborhoodBarTrack}>
               <View style={[styles.neighborhoodBarFill, { width: '50%' }]} />
             </View>
-            <Text style={[styles.neighborhoodMeta, { fontSize: 14 }]}>Tap to visit →</Text>
+            <Text style={[styles.neighborhoodMeta, { fontSize: 14 }]}>Community goal progress</Text>
           </TouchableOpacity>
 
-          {/* Module Carousel */}
-          <ModuleCarousel modules={modules} />
+          {/* Module Cards Grid (2x2) */}
+          <View style={styles.moduleGrid}>
+            {modules.map((m, idx) => (
+              <TouchableOpacity
+                key={m.id}
+                onPress={() => navigation.navigate('Track', { screen: m.route })}
+                activeOpacity={0.9}
+                style={[styles.cardBase, styles.moduleCard]}
+              >
+                <View style={styles.moduleHeaderRow}>
+                  <View style={[styles.iconWrap, { backgroundColor: m.lightColor }]}>
+                    <Icon name={m.icon} size={20} color={m.color} />
+                  </View>
+                  <Text style={styles.moduleName}>{m.title}</Text>
+                </View>
+                <View style={styles.moduleStatsRow}>
+                  <Text style={styles.statValue}>{moduleStatValue(m.id)}</Text>
+                  <Text style={styles.lastLogged}>{getLastLogTime(m.id === 'mind' ? 'headVision' : m.id)}</Text>
+                </View>
+                <TouchableOpacity style={styles.logButton} onPress={() => navigation.navigate('Track', { screen: m.route })}>
+                  <Text style={styles.logButtonText}>Log Now</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-          {/* Bottom status grid */}
-          <StatusGrid
-            data={{
-              hydration: `${Math.round(overallScore * 0.025 * 100) / 100}L`,
-              energy: `${pet.energy}%`,
-              mind: selectedMood >= 4 ? 'Good' : selectedMood === 3 ? 'OK' : 'Low',
-              mood: selectedMood,
-            }}
-            onPress={(id) => {
-              const route = id === 'hydration' ? 'FluidFlow' : id === 'energy' ? 'Vitality' : id === 'mind' ? 'MindRadar' : 'Gut';
-              navigation.navigate('Track', { screen: route });
-            }}
-          />
+          {/* Removed bottom status grid; stats are now inside module cards */}
 
           {/* (Moved deeper features to tab navigation) */}
         </ScrollView>
@@ -212,7 +260,20 @@ const styles = StyleSheet.create({
     fontSize: typography.md,
     color: colors.textSecondary,
   },
-  neighborhoodCard: { backgroundColor: '#FFFFFF', borderRadius: 14, padding: spacing.md, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 2, marginBottom: spacing.md },
+  // Shared translucent card base
+  cardBase: {
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  neighborhoodCard: { marginBottom: 12, height: 80 },
   neighborhoodTitle: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
   neighborhoodBarTrack: { height: 8, backgroundColor: '#E0F2F1', borderRadius: 999, overflow: 'hidden', marginTop: 8 },
   neighborhoodBarFill: { height: '100%', backgroundColor: '#10B981' },
@@ -220,6 +281,18 @@ const styles = StyleSheet.create({
   miniRow: {
     marginTop: 24,
   },
+  creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
+  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 12 },
+  moduleCard: { width: '48%' },
+  moduleHeaderRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  iconWrap: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginRight: 8 },
+  moduleName: { fontSize: 16, fontWeight: '700', color: '#1F2937' },
+  moduleStatsRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 },
+  statValue: { fontSize: 18, fontWeight: '800', color: '#1F2937' },
+  lastLogged: { fontSize: 12, color: '#6B7280' },
+  logButton: { marginTop: 4, height: 34, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
+  logButtonText: { color: '#FFF', fontWeight: '700' },
 });
 
 export default HomeScreen;
