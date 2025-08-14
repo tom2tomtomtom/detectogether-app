@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import MainStack from './src/navigation/MainTabNavigator';
 import { useStore } from './src/store/useStore';
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import { View } from 'react-native';
+import { View, AppState } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from './src/services/NotificationService';
 
@@ -35,6 +35,15 @@ export default function App() {
     });
     return () => sub.remove();
   }, [onboardingComplete]);
+
+  // Update pet health when app returns to foreground
+  const updatePetHealthOnFocus = useStore((s) => s.updatePetHealthOnFocus);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') updatePetHealthOnFocus();
+    });
+    return () => sub.remove();
+  }, []);
 
   return (
     <SafeAreaProvider>

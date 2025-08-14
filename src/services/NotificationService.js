@@ -73,6 +73,18 @@ export async function scheduleMorningCheckIn(time = '08:00') {
   });
 }
 
+// Evening reminder if no logs today
+export async function schedulePetNeedsCare() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: 'Your pet misses you! 🥺',
+      body: "They haven't been fed today. Quick check-in?",
+      data: { type: 'pet_care' },
+    },
+    trigger: { hour: 20, minute: 0, repeats: true },
+  });
+}
+
 export async function scheduleHydrationReminders() {
   // 9am to 7pm every 2 hours
   for (let hour = 9; hour <= 19; hour += 2) {

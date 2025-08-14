@@ -115,6 +115,38 @@ const useStore = create((set, get) => ({
       console.error('Error loading user data:', error);
     }
   },
+  // Calculate a decayed health score based on time since last log (Tamagotchi-style)
+  calculatePetHealth: () => {
+    const state = get();
+    const now = Date.now();
+    // Aggregate recent logs across modules
+    const allLogs = [
+      ...(state.healthLogs?.hydration || []),
+      ...(state.healthLogs?.energy || []),
+      ...(state.healthLogs?.gut || []),
+      ...(state.healthLogs?.headVision || []),
+      ...(state.healthLogs?.skin || []),
+    ];
+    if (allLogs.length === 0) {
+      return 50; // new users start neutral
+    }
+    const lastLog = allLogs
+      .slice()
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+    const hoursSinceLog = (now - new Date(lastLog.timestamp).getTime()) / (1000 * 60 * 60);
+    // Grace period 6h, -2%/h afterwards, max -50%
+    let decay = 0;
+    if (hoursSinceLog > 6) {
+      decay = Math.min(50, Math.floor((hoursSinceLog - 6) * 2));
+    }
+    const baseHealth = state.pet?.health ?? 50;
+    return Math.max(10, baseHealth - decay);
+  },
+  // Re-evaluate pet health when app becomes active
+  updatePetHealthOnFocus: () => {
+    const calculatedHealth = get().calculatePetHealth();
+    set((state) => ({ pet: { ...state.pet, health: calculatedHealth } }));
+  },
   
   setUserData: (userData) => {
     set((state) => ({

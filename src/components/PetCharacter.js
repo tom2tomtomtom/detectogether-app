@@ -21,6 +21,14 @@ const getStateFromHealth = (healthScore) => {
   return 'critical';
 };
 
+// Optional helper to map time since last log to mood (Tamagotchi style)
+export const getMoodFromTimeSinceLog = (hoursSinceLog) => {
+  if (hoursSinceLog < 6) return 'happy';
+  if (hoursSinceLog < 12) return 'normal';
+  if (hoursSinceLog < 24) return 'sad';
+  return 'critical';
+};
+
 const PetCharacter = ({ petType = 'dog', healthScore = 50, mood, isAnimating = true, size = 80 }) => {
   const user = useStore((s) => s.user);
   const derivedState = mood || getStateFromHealth(healthScore);
