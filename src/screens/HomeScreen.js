@@ -90,12 +90,16 @@ const HomeScreen = ({ navigation }) => {
 
   // Helpers for module stats
   const healthLogs = useStore((s) => s.healthLogs);
-  const getLastLogTime = (key) => {
+  const formatSince = (key) => {
     const logs = healthLogs[key] || [];
-    if (!logs.length) return 'No logs yet';
-    const diffMs = Date.now() - new Date(logs[logs.length - 1].timestamp).getTime();
-    const hrs = Math.max(1, Math.floor(diffMs / 3600000));
-    return `${hrs}h ago`;
+    if (!logs.length) return '—';
+    const ts = logs[logs.length - 1].timestamp;
+    const diffMs = Date.now() - new Date(ts).getTime();
+    const hours = diffMs / 3600000;
+    if (hours < 1) return 'Now';
+    if (hours < 24) return `${Math.floor(hours)}h`;
+    const days = Math.floor(hours / 24);
+    return `${days}d`;
   };
   const getToday = () => new Date().toDateString();
   const getHydrationToday = () => {
@@ -185,12 +189,14 @@ const HomeScreen = ({ navigation }) => {
                   activeOpacity={0.9}
                   style={[styles.cardBase, styles.moduleCard]}
                 >
-                  <View>
-                    <Icon name={m.icon} size={24} color={m.color} />
-                    <Text style={styles.moduleName}>{m.title}</Text>
+                  <View style={styles.moduleContent}>
+                    <View style={styles.moduleHeader}> 
+                      <Icon name={m.icon} size={24} color={m.color} />
+                      <Text style={styles.moduleName}>{m.title}</Text>
+                    </View>
                     <Text style={styles.moduleStats}>{moduleStatValue(m.id)}</Text>
+                    <Text style={styles.lastLogged}>{formatSince(m.id === 'mind' ? 'headVision' : m.id)}</Text>
                   </View>
-                  <Text style={styles.lastLoggedTiny}>{getLastLogTime(m.id === 'mind' ? 'headVision' : m.id)}</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -279,10 +285,12 @@ const styles = StyleSheet.create({
   creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
   moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 12 },
   moduleWrapper: { width: '31%', marginBottom: 12 },
-  moduleCard: { height: 120, justifyContent: 'space-between', padding: 12 },
-  moduleName: { fontSize: 14, fontWeight: '600', color: '#1F2937', marginTop: 4 },
-  moduleStats: { fontSize: 18, fontWeight: 'bold', color: '#1F2937', marginTop: 4 },
-  lastLoggedTiny: { fontSize: 11, color: '#6B7280', alignSelf: 'flex-end' },
+  moduleCard: { height: 110, width: '100%', overflow: 'hidden', padding: 12 },
+  moduleContent: { flex: 1, justifyContent: 'space-between' },
+  moduleHeader: { alignItems: 'center' },
+  moduleName: { fontSize: 14, fontWeight: '600', color: '#1F2937', marginTop: 4, textAlign: 'center' },
+  moduleStats: { fontSize: 18, fontWeight: 'bold', color: '#1F2937', textAlign: 'center' },
+  lastLogged: { fontSize: 11, color: '#6B7280', textAlign: 'center', marginBottom: 0 },
 });
 
 export default HomeScreen;
