@@ -104,18 +104,29 @@ const MainTabNavigator = () => {
   const statsRef = React.useRef(null);
   return (
     <View style={{ flex: 1 }}>
-      <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+      <Tab.Navigator
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{ headerShown: false, unmountOnBlur: true }}
+        screenListeners={({ navigation, route }) => ({
+          tabPress: (e) => {
+            // Always navigate to root of the tapped stack
+            e.preventDefault();
+            const targetScreen = route.name === 'Track'
+              ? 'TrackingHub'
+              : route.name === 'Stats'
+              ? 'StatsScreen'
+              : route.name === 'Profile'
+              ? 'ProfileScreen'
+              : 'HomeScreen';
+            navigation.navigate(route.name, { screen: targetScreen, params: { reset: true } });
+          },
+        })}
+      >
         <Tab.Screen name="Home" component={HomeStackScreen} />
         <Tab.Screen name="Track" component={TrackStackScreen} />
         <Tab.Screen
           name="Stats"
           component={StatsStackScreen}
-          listeners={({ navigation }) => ({
-            tabPress: (e) => {
-              // always go to root of the Stats stack
-              navigation.navigate('Stats', { screen: 'StatsScreen' });
-            },
-          })}
         />
         <Tab.Screen name="Profile" component={ProfileStackScreen} />
       </Tab.Navigator>
