@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   moodDotActive: {
     backgroundColor: '#5856D6',
   },
-  heroSection: { alignItems: 'center', marginTop: 8, marginBottom: 12 },
+  heroSection: { alignItems: 'center', marginTop: 0, marginBottom: 12 },
   healthPercent: {
     marginTop: spacing.lg,
     fontSize: 48,
@@ -249,11 +249,7 @@ const styles = StyleSheet.create({
     color: '#5856D6',
   },
   // removed linear progress styles
-  statusText: {
-    marginTop: spacing.sm,
-    fontSize: typography.md,
-    color: colors.textSecondary,
-  },
+  statusText: { marginTop: 8, marginBottom: 12, fontSize: 16, color: colors.textSecondary },
   // Shared translucent card base
   cardBase: {
     backgroundColor: 'rgba(255,255,255,0.6)',
@@ -275,7 +271,7 @@ const styles = StyleSheet.create({
   miniRow: {
     marginTop: 24,
   },
-  creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 16, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
   moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 0 },
   moduleWrapper: { width: '31%', marginBottom: 12 },

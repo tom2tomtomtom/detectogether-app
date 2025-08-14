@@ -120,10 +120,12 @@ export default function PetHero({
                 <Animated.View style={animatedStyle}>
                   <PetCharacter petType={petType} healthScore={healthScore} size={petPixel} />
                 </Animated.View>
+              {/* Percentage inside the white circle */}
+              <Text style={{ position: 'absolute', bottom: 15, fontSize: 24, fontWeight: '700', color: '#5856D6' }}>
+                {Math.round(healthScore)}%
+              </Text>
               </View>
             </View>
-            {/* Percentage text - STATIC, below the ring */}
-            <Text style={{ marginTop: 6, fontSize: 26, fontWeight: '800', color: '#5856D6' }}>{Math.round(healthScore)}%</Text>
           </View>
         </PanGestureHandler>
       </TapGestureHandler>
