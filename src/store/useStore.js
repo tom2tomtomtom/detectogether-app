@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ACHIEVEMENTS, ALL_ACHIEVEMENTS, MODULE_KEYS } from '../utils/achievements';
 
+// Debounced persistence to avoid heavy sync writes on rapid logs
+let __persistTimer = null;
+
 const useStore = create((set, get) => ({
   // User State
   user: {
@@ -155,20 +158,23 @@ const useStore = create((set, get) => ({
   },
   
   addHealthLog: (type, logData) => {
-    set((state) => ({
-      healthLogs: {
-        ...state.healthLogs,
-        [type]: [...state.healthLogs[type], { ...logData, timestamp: new Date() }],
-      },
-    }));
-    get().updatePetStatus(type);
-    // award base credits per module
-    const moduleBase = { hydration: 10, energy: 10, gut: 15, headVision: 10, skin: 25 };
-    const amount = moduleBase[type] || 5;
-    get().addCredits(amount, `log:${type}`);
-    get().updateVistaState(type);
-    get().checkAchievements(type);
-    get().saveData();
+    try {
+      set((state) => ({
+        healthLogs: {
+          ...state.healthLogs,
+          [type]: [...(state.healthLogs[type] || []), { ...logData, timestamp: new Date().toISOString() }],
+        },
+      }));
+      get().updatePetStatus(type);
+      const moduleBase = { hydration: 10, energy: 10, gut: 15, headVision: 10, skin: 25 };
+      const amount = moduleBase[type] || 5;
+      get().addCredits(amount, `log:${type}`);
+      get().updateVistaState(type);
+      get().checkAchievements(type);
+      get().saveData();
+    } catch (e) {
+      console.error('addHealthLog error:', e);
+    }
   },  
   // Credits API
   addCredits: (amount, source = 'action', combo = false) => {
@@ -468,20 +474,23 @@ const useStore = create((set, get) => ({
   
   saveData: async () => {
     try {
-      const state = get();
-      const dataToSave = {
-        user: state.user,
-        pet: state.pet,
-        healthLogs: state.healthLogs,
-        achievements: state.achievements,
-        notifications: state.notifications,
-        activeMissions: state.activeMissions,
-        completedMissions: state.completedMissions,
-        missionProgress: state.missionProgress,
-      };
-      await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
+      if (__persistTimer) clearTimeout(__persistTimer);
+      __persistTimer = setTimeout(async () => {
+        const state = get();
+        const dataToSave = {
+          user: state.user,
+          pet: state.pet,
+          healthLogs: state.healthLogs,
+          achievements: state.achievements,
+          notifications: state.notifications,
+          activeMissions: state.activeMissions,
+          completedMissions: state.completedMissions,
+          missionProgress: state.missionProgress,
+        };
+        await AsyncStorage.setItem('userData', JSON.stringify(dataToSave));
+      }, 250);
     } catch (error) {
-      console.error('Error saving user data:', error);
+      console.error('Error saving user data (debounced):', error);
     }
   },
   refreshWeeklyMissions: () => {
