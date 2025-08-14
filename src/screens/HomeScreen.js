@@ -152,7 +152,7 @@ const HomeScreen = ({ navigation }) => {
           <Text style={[styles.statusText, { marginTop: 12 }]}>{statusText}</Text>
           </View>
 
-          {/* Neighborhood widget */}
+          {/* Neighborhood widget (same height as cards) */}
           <TouchableOpacity
             onPress={() => navigation.navigate('Stats', { screen: 'Neighborhood' })}
             activeOpacity={0.9}
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   moodDotActive: {
     backgroundColor: '#5856D6',
   },
-  heroSection: { alignItems: 'center' },
+  heroSection: { alignItems: 'center', marginBottom: 12 },
   healthPercent: {
     marginTop: spacing.lg,
     fontSize: 48,
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.3)',
   },
-  neighborhoodCard: { marginBottom: 12, height: 80 },
+  neighborhoodCard: { marginBottom: 12, height: 105 },
   neighborhoodTitle: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
   neighborhoodBarTrack: { height: 8, backgroundColor: '#E0F2F1', borderRadius: 999, overflow: 'hidden', marginTop: 8 },
   neighborhoodBarFill: { height: '100%', backgroundColor: '#10B981' },
