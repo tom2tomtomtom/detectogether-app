@@ -169,7 +169,7 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           {/* Module Cards Grid (2x2) */}
-          <View style={styles.moduleGrid}>
+          <View style={[styles.moduleGrid, { marginTop: 12 }] }>
             {modules.map((m) => {
               const key = m.id === 'mind' ? 'headVision' : m.id;
               const isAbout = m.id === 'about';
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
-  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 12 },
+  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 0 },
   moduleWrapper: { width: '31%', marginBottom: 12 },
   moduleCard: {
     height: 105,
