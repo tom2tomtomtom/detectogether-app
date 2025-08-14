@@ -17,7 +17,8 @@ const AchievementBadge = ({ title, unlocked = false, progress = 0, size = 'large
   }
 
   return (
-    <View style={[styles.container, { width: s, alignItems: 'center' }]}>      <Animated.View
+    <View style={[styles.container, { width: s, alignItems: 'center' }]}>
+      <Animated.View
         style={[styles.badge, animatedStyle, { width: s, height: s, borderRadius: s / 2, backgroundColor: unlocked ? '#34D399' : '#E5E7EB' }]}
       >
         {unlocked ? (
@@ -28,7 +29,8 @@ const AchievementBadge = ({ title, unlocked = false, progress = 0, size = 'large
       </Animated.View>
       <Text style={styles.title} numberOfLines={1}>{title}</Text>
       {typeof progress === 'number' && progress > 0 && progress < 1 ? (
-        <View style={[styles.progressBar, { width: s }]}>          <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
+        <View style={[styles.progressBar, { width: s }]}>
+          <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
         </View>
       ) : null}
     </View>
