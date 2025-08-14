@@ -54,17 +54,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   );
 };
 
-// FAB
-const QuickLogFAB = () => {
-  const navigation = useNavigation();
-  return (
-    <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('Track')} activeOpacity={0.9}>
-      <LinearGradient colors={[colors.primary, colors.primaryDark]} style={styles.fabGradient}>
-        <Icon name="add" size={28} color={colors.textWhite} />
-      </LinearGradient>
-    </TouchableOpacity>
-  );
-};
+// Removed FAB
 
 // Stacks
 const HomeStackScreen = () => (
@@ -127,7 +117,6 @@ const MainTabNavigator = () => {
         />
         <Tab.Screen name="Profile" component={ProfileStackScreen} />
       </Tab.Navigator>
-      <QuickLogFAB />
     </View>
   );
 };
@@ -148,8 +137,6 @@ const styles = StyleSheet.create({
   },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 8 },
   activeIndicator: { position: 'absolute', bottom: -12, width: 4, height: 4, borderRadius: 2, backgroundColor: colors.primary },
-  fab: { position: 'absolute', bottom: 80, alignSelf: 'center', ...shadows.lg },
-  fabGradient: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
 });
 
 export default MainTabNavigator;
