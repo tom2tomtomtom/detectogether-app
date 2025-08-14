@@ -213,7 +213,7 @@ const useStore = create((set, get) => ({
       const toKey = (t) => (t === 'colors' ? 'color' : t === 'accessories' ? 'accessory' : t === 'effects' ? 'effect' : t === 'environments' ? 'environment' : t);
       const equipKey = toKey(itemType);
       if (!customization.equippedItems[equipKey]) {
-        customization.equippedItems = { ...(customization.equippedItems || {}), [key]: itemId };
+        customization.equippedItems = { ...(customization.equippedItems || {}), [equipKey]: itemId };
       }
       pet.customization = customization;
       pet.careCredits = (pet.careCredits || 0) - cost;
