@@ -5,7 +5,7 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null }) => {
   const petImages = {
     happy: require('../../assets/pet-happy.png'),
     normal: require('../../assets/pet-normal.png'),
-    sad: require('../../assets/pet-sad.png'),
+    sad: require('../../assets/pet-angry.png'), // fallback to available art
     sleeping: require('../../assets/pet-sleeping.png'),
     sick: require('../../assets/pet-sick.png'),
   };
