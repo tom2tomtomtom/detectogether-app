@@ -1,16 +1,12 @@
 export const storeItems = {
   accessories: [
     { id: 'bowtie', name: 'Bow Tie', cost: 50, icon: '🎀' },
-    { id: 'hat', name: 'Party Hat', cost: 100, icon: '🎩' },
-    { id: 'glasses', name: 'Sunglasses', cost: 150, icon: '🕶️' },
+    { id: 'tophat', name: 'Top Hat', cost: 100, icon: '🎩' },
+    { id: 'sunglasses', name: 'Sunglasses', cost: 150, icon: '🕶️' },
     { id: 'crown', name: 'Royal Crown', cost: 500, icon: '👑' },
   ],
   colors: [
-    { id: 'default', name: 'Default', cost: 0, hex: '#FFE4B5' },
-    { id: 'golden', name: 'Golden', cost: 0, hex: '#F6D9B3' },
-    { id: 'midnight', name: 'Midnight', cost: 200, hex: '#2C3E50' },
-    { id: 'rose', name: 'Rose Gold', cost: 250, hex: '#E8B4B8' },
-    { id: 'rainbow', name: 'Rainbow', cost: 400, gradient: true },
+    { id: 'default', name: 'Lavender', cost: 0, hex: '#D4C5E8' },
   ],
   effects: [
     { id: 'sparkles', name: 'Sparkles', cost: 300, animation: 'sparkle' },

@@ -9,7 +9,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { useStore } from '../store/useStore';
-import ModernPet from './pets/ModernPet';
+import PetImage from './PetImage';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -89,8 +89,7 @@ const PetCharacter = ({ petType = 'dog', healthScore = 50, mood, isAnimating = t
   const petColor = user?.petColor || 'golden';
 
   const renderPet = () => {
-    const mappedType = petType === 'cat' ? 'cat' : petType === 'bunny' ? 'bunny' : 'dog';
-    return <ModernPet petType={mappedType} mood={derivedState} size={size} />;
+    return <PetImage mood={derivedState} size={size} accessory={useStore((s)=> s.pet?.customization?.equippedItems?.accessory)} />;
   };
 
   return (
