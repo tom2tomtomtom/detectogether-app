@@ -8,7 +8,7 @@ import {
   Dimensions,
   Platform
 } from 'react-native';
-import { Camera, CameraType, FlashMode } from 'expo-camera';
+import { Camera, CameraType, FlashMode, CameraView } from 'expo-camera';
 import { BackHandler } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -181,11 +181,10 @@ const PhotoCapture = ({
       <SafeAreaView style={styles.safeArea}>
         {/* Camera View */}
         <View style={styles.cameraContainer}>
-          <Camera
+          <CameraView
             ref={cameraRef}
             style={styles.camera}
-            {...(supportsType ? { type: TYPE_BACK } : {})}
-            {...(supportsFlash && flashMode != null ? { flashMode } : {})}
+            {...(supportsType ? { facing: 'back' } : {})}
             onCameraReady={() => setCameraReady(true)}
             ratio="4:3"
           >
@@ -204,7 +203,7 @@ const PhotoCapture = ({
                 </TouchableOpacity>
               </BlurView>
             )}
-          </Camera>
+          </CameraView>
         </View>
 
         {/* Controls */}
