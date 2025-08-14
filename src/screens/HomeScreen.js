@@ -34,51 +34,12 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const modules = [
-    {
-      id: 'hydration',
-      title: 'Fluid Flow',
-      icon: 'water',
-      color: colors.hydration,
-      lightColor: colors.hydrationLight,
-      route: 'FluidFlow',
-      status: 'Well hydrated',
-    },
-    {
-      id: 'energy',
-      title: 'Vitality',
-      icon: 'flash',
-      color: colors.energy,
-      lightColor: colors.energyLight,
-      route: 'Vitality',
-      status: 'High energy',
-    },
-    {
-      id: 'gut',
-      title: 'Gut Health',
-      icon: 'nutrition',
-      color: colors.gut,
-      lightColor: colors.gutLight,
-      route: 'Gut',
-      status: 'Balanced',
-    },
-    {
-      id: 'mind',
-      title: "Mind's Radar",
-      icon: 'eye',
-      color: colors.mind,
-      lightColor: colors.mindLight,
-      route: 'MindRadar',
-      status: 'Calm',
-    },
-    {
-      id: 'skin',
-      title: 'Dermal Map',
-      icon: 'sparkles',
-      color: colors.skin,
-      lightColor: colors.skinLight,
-      route: 'DermalMap',
-      status: 'Clear',
-    },
+    { id: 'hydration', title: 'Fluid Flow', icon: 'water', color: colors.hydration, lightColor: colors.hydrationLight, route: 'FluidFlow', status: 'Well hydrated' },
+    { id: 'energy', title: 'Vitality', icon: 'flash', color: colors.energy, lightColor: colors.energyLight, route: 'Vitality', status: 'High energy' },
+    { id: 'gut', title: 'Gut Health', icon: 'nutrition', color: colors.gut, lightColor: colors.gutLight, route: 'Gut', status: 'Balanced' },
+    { id: 'mind', title: "Mind's Radar", icon: 'eye', color: colors.mind, lightColor: colors.mindLight, route: 'MindRadar', status: 'Calm' },
+    { id: 'skin', title: 'Dermal Map', icon: 'sparkles', color: colors.skin, lightColor: colors.skinLight, route: 'DermalMap', status: 'Clear' },
+    { id: 'about', title: 'About', icon: 'information-circle', color: '#8B5CF6', lightColor: '#E9D5FF', route: 'About', status: '' },
   ];
 
   const statusText = useMemo(() => {
@@ -207,18 +168,24 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.moduleGrid}>
             {modules.map((m) => {
               const key = m.id === 'mind' ? 'headVision' : m.id;
+              const isAbout = m.id === 'about';
               const name = moduleShortNames[m.title] || m.title;
               return (
                 <View key={m.id} style={styles.moduleWrapper}>
-                  <TouchableOpacity style={[styles.cardBase, styles.moduleCard]} onPress={() => handleModulePress(m)} activeOpacity={0.9}>
+                  <TouchableOpacity style={[styles.cardBase, styles.moduleCard, isAbout && styles.aboutCard]} onPress={() => handleModulePress(m)} activeOpacity={0.9}>
                     {/* Icon */}
                     <Icon name={m.icon} size={24} color={m.color} style={styles.moduleIcon} />
                     {/* Name */}
                     <Text style={styles.moduleName} numberOfLines={1}>{name}</Text>
                     {/* Stat */}
-                    <Text style={styles.moduleStats} numberOfLines={1}>{moduleStatValue(m.id) || '—'}</Text>
-                    {/* Time */}
-                    <Text style={styles.lastLogged} numberOfLines={1}>{formatTimeKey(key)}</Text>
+                    {isAbout ? (
+                      <Text style={styles.aboutSubtext}>How it works</Text>
+                    ) : (
+                      <>
+                        <Text style={styles.moduleStats} numberOfLines={1}>{moduleStatValue(m.id) || '—'}</Text>
+                        <Text style={styles.lastLogged} numberOfLines={1}>{formatTimeKey(key)}</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
                 </View>
               );
@@ -320,6 +287,13 @@ const styles = StyleSheet.create({
   moduleName: { fontSize: 13, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
   moduleStats: { fontSize: 20, fontWeight: 'bold', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
   lastLogged: { fontSize: 11, color: '#6B7280', textAlign: 'center' },
+  aboutCard: {
+    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderStyle: 'dashed',
+  },
+  aboutSubtext: { fontSize: 11, color: '#6B7280', textAlign: 'center', marginTop: 8 },
 });
 
 export default HomeScreen;

@@ -3,8 +3,8 @@
 ## Current Project
 - Name: DetecTogether App
 - Type: React Native Mobile App (Expo) with web-ready scaffolding
-- Size: ~7,000+ lines
-- Status: Phase 2 In Progress - Core features complete, gamification systems active
+- Size: ~8,500+ lines
+- Status: Phase 2 Nearly Complete - Gamification active, missing photo/QR features
 
 ## Tech Stack
 - Frontend: React Native with Expo
@@ -33,7 +33,8 @@
 - Session 14: Module-specific vistas + HacksSection in all modules
 - Session 15: Weekly Missions (Stats → Missions), Stats overview population
 - Session 16: Evolving Pet Environment by streak + credits
-- Last Updated: 2025-08-14 (Night)
+- Session 17: Home screen redesign - no scroll, 3-column grid, integrated stats, About card
+- Last Updated: 2025-08-15 (Morning)
 
 ## Progress Tracking
 - [x] Project setup
