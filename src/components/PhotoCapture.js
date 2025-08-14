@@ -28,7 +28,11 @@ const PhotoCapture = ({
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [showBlur, setShowBlur] = useState(false);
-  const [flashMode, setFlashMode] = useState(FlashMode.off);
+  // Determine flash constants cross-version; if unavailable, disable flash feature
+  const FLASH_OFF = Camera?.Constants?.FlashMode?.off ?? FlashMode?.off ?? null;
+  const FLASH_ON = Camera?.Constants?.FlashMode?.on ?? FlashMode?.on ?? null;
+  const supportsFlash = FLASH_OFF !== null && FLASH_ON !== null;
+  const [flashMode, setFlashMode] = useState(FLASH_OFF);
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -106,7 +110,8 @@ const PhotoCapture = ({
   };
 
   const toggleFlash = () => {
-    setFlashMode((prev) => (prev === FlashMode.off ? FlashMode.on : FlashMode.off));
+    if (!supportsFlash) return;
+    setFlashMode((prev) => (prev === FLASH_OFF ? FLASH_ON : FLASH_OFF));
   };
 
   const getAnalysisOverlay = () => {
@@ -176,7 +181,7 @@ const PhotoCapture = ({
             ref={cameraRef}
             style={styles.camera}
             type={CameraType.back}
-            flashMode={flashMode}
+            {...(supportsFlash && flashMode != null ? { flashMode } : {})}
             onCameraReady={() => setCameraReady(true)}
             ratio="4:3"
           >
@@ -212,8 +217,8 @@ const PhotoCapture = ({
                'Skin Analysis'}
             </Text>
 
-            <TouchableOpacity style={styles.controlButton} onPress={toggleFlash}>
-              <Text style={styles.controlText}>{flashMode === FlashMode.off ? '🔦' : '💡'}</Text>
+            <TouchableOpacity style={[styles.controlButton, !supportsFlash && { opacity: 0.5 }]} onPress={toggleFlash} disabled={!supportsFlash}>
+              <Text style={styles.controlText}>{!supportsFlash ? '—' : flashMode === FLASH_OFF ? '🔦' : '💡'}</Text>
             </TouchableOpacity>
           </View>
 
