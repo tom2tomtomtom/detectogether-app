@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,10 +25,19 @@ const PhotoGallery = ({ moduleType, onClose }) => {
   const [comparisonPhotos, setComparisonPhotos] = useState([]);
   const scrollRef = useRef(null);
 
-  const photoHistory = useStore(state => state.getPhotoHistory(moduleType, 50));
+  // Avoid calling functions that allocate a new array on every render inside the selector
+  // Read raw photos from store and derive memoized history locally
+  const rawPhotos = useStore((state) => (state.photoLogs?.[moduleType] || []));
   const removePhotoLog = useStore(state => state.removePhotoLog);
   const clearPhotoLogs = useStore(state => state.clearPhotoLogs);
   const exportPhotoData = useStore(state => state.exportPhotoData);
+
+  const photoHistory = useMemo(() => {
+    return [...rawPhotos]
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 50)
+      .filter((p) => p && p.uri);
+  }, [rawPhotos]);
 
   const getModuleName = () => {
     switch (moduleType) {
@@ -112,14 +121,16 @@ const PhotoGallery = ({ moduleType, onClose }) => {
     setComparisonPhotos(newComparison);
   };
 
-  const renderPhotoItem = ({ photo, onPress, isSelected = false }) => (
-    <TouchableOpacity
-      key={photo.id}
-      style={[styles.photoItem, isSelected && styles.photoItemSelected]}
-      onPress={() => onPress(photo)}
-      activeOpacity={0.8}
-    >
-      <Image source={{ uri: photo.uri }} style={styles.photoImage} />
+  const renderPhotoItem = ({ photo, onPress, isSelected = false }) => {
+    if (!photo || !photo.uri) return null;
+    return (
+      <TouchableOpacity
+        key={photo.id}
+        style={[styles.photoItem, isSelected && styles.photoItemSelected]}
+        onPress={() => onPress(photo)}
+        activeOpacity={0.8}
+      >
+        <Image source={{ uri: photo.uri }} style={styles.photoImage} />
       
       {/* Blur overlay for sensitive content */}
       {photo.blurred && moduleType === 'gut' && (
@@ -150,25 +161,28 @@ const PhotoGallery = ({ moduleType, onClose }) => {
           </Text>
         </View>
       )}
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
-  const renderSelectedPhotoModal = () => (
-    <Modal visible={!!selectedPhoto} animationType="fade" transparent>
-      <View style={styles.modalOverlay}>
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setSelectedPhoto(null)}>
-              <Text style={styles.modalCloseButton}>✕</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Photo Details</Text>
-            <TouchableOpacity onPress={() => handleDeletePhoto(selectedPhoto.id)}>
-              <Text style={styles.modalDeleteButton}>🗑️</Text>
-            </TouchableOpacity>
-          </View>
+  const renderSelectedPhotoModal = () => {
+    if (!selectedPhoto || !selectedPhoto.uri) return null;
+    return (
+      <Modal visible={!!selectedPhoto} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <SafeAreaView style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setSelectedPhoto(null)}>
+                <Text style={styles.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Photo Details</Text>
+              <TouchableOpacity onPress={() => handleDeletePhoto(selectedPhoto.id)}>
+                <Text style={styles.modalDeleteButton}>🗑️</Text>
+              </TouchableOpacity>
+            </View>
 
-          <ScrollView style={styles.modalContent}>
-            <Image source={{ uri: selectedPhoto.uri }} style={styles.modalImage} />
+            <ScrollView style={styles.modalContent}>
+              <Image source={{ uri: selectedPhoto.uri }} style={styles.modalImage} />
             
             <View style={styles.analysisSection}>
               <Text style={styles.analysisTitle}>Analysis Results</Text>
@@ -231,11 +245,12 @@ const PhotoGallery = ({ moduleType, onClose }) => {
                 </View>
               )}
             </View>
-          </ScrollView>
-        </SafeAreaView>
-      </View>
-    </Modal>
-  );
+            </ScrollView>
+          </SafeAreaView>
+        </View>
+      </Modal>
+    );
+  };
 
   const renderComparisonModal = () => (
     <Modal visible={showComparison} animationType="slide" transparent>
