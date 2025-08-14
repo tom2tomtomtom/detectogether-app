@@ -15,14 +15,20 @@ import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
 import HacksSection from '../components/HacksSection';
+import PhotoCapture from '../components/PhotoCapture';
+import PhotoGallery from '../components/PhotoGallery';
+import { analyzeUrineColor } from '../utils/ColorAnalyzer';
 
 const FluidFlowScreen = () => {
   const [showColorModal, setShowColorModal] = useState(false);
   const [showHydrationModal, setShowHydrationModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false);
   
   const addHealthLog = useStore((state) => state.addHealthLog);
   const addCredits = useStore((s) => s.addCredits);
+  const addPhotoLog = useStore((state) => state.addPhotoLog);
   const healthLogs = useStore((state) => state.healthLogs.hydration);
 
   const colorOptions = [
@@ -43,6 +49,21 @@ const FluidFlowScreen = () => {
   const [creditBurst, setCreditBurst] = useState(null);
 
   const handleColorLog = (option) => {
+    if (option.id === 5) { // "Didn't notice/unsure"
+      Alert.alert(
+        'Log Photo?',
+        'Would you like to take a photo for analysis?',
+        [
+          { text: 'Yes', onPress: () => setShowPhotoCapture(true) },
+          { text: 'Skip', onPress: () => completeColorLog(option) }
+        ]
+      );
+    } else {
+      completeColorLog(option);
+    }
+  };
+
+  const completeColorLog = (option) => {
     addHealthLog('hydration', {
       type: 'color',
       value: option.id,
@@ -55,6 +76,45 @@ const FluidFlowScreen = () => {
     const earned = 10; // combo handled internally
     const { width } = Dimensions.get('window');
     setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
+  };
+
+  const handlePhotoCapture = async (photoData) => {
+    try {
+      // Analyze the photo
+      const analysis = analyzeUrineColor(photoData.uri);
+      
+      // Save photo with analysis
+      const photoId = addPhotoLog('fluid', {
+        ...photoData,
+        analysis,
+        autoDelete: false // Don't auto-delete urine photos
+      });
+
+      // Log the health data based on analysis
+      const detectedOption = colorOptions.find(opt => opt.id === analysis.colorLevel) || colorOptions[0];
+      addHealthLog('hydration', {
+        type: 'color_photo',
+        value: analysis.colorLevel,
+        label: `Photo Analysis: ${analysis.hydrationStatus}`,
+        interpretation: analysis.recommendation,
+        photoId,
+        confidence: analysis.confidence
+      });
+
+      setShowPhotoCapture(false);
+      Alert.alert(
+        'Photo Analyzed!', 
+        `Analysis: ${analysis.hydrationStatus}\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%`
+      );
+
+      // Visual credit burst
+      const earned = 15; // Bonus for photo
+      const { width } = Dimensions.get('window');
+      setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
+    } catch (error) {
+      setShowPhotoCapture(false);
+      Alert.alert('Error', 'Failed to analyze photo. Please try again.');
+    }
   };
 
   const handleHydrationLog = (amount) => {
@@ -128,6 +188,14 @@ const FluidFlowScreen = () => {
           >
             <Icon name="color-palette" size={24} color="#3B82F6" />
             <Text style={styles.actionButtonText}>Log Urine Color</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.actionButton, styles.secondaryButton]}
+            onPress={() => setShowPhotoGallery(true)}
+          >
+            <Icon name="images" size={24} color="#6B7280" />
+            <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>View Photo History</Text>
           </TouchableOpacity>
         </View>
 
@@ -225,6 +293,26 @@ const FluidFlowScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Photo Capture Modal */}
+      {showPhotoCapture && (
+        <PhotoCapture
+          analysisType="urine"
+          onCapture={handlePhotoCapture}
+          onClose={() => setShowPhotoCapture(false)}
+          autoBlur={false}
+        />
+      )}
+
+      {/* Photo Gallery Modal */}
+      {showPhotoGallery && (
+        <Modal animationType="slide" presentationStyle="fullScreen">
+          <PhotoGallery
+            moduleType="fluid"
+            onClose={() => setShowPhotoGallery(false)}
+          />
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };

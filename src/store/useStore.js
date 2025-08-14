@@ -53,6 +53,13 @@ const useStore = create((set, get) => ({
     skin: [],
   },
 
+  // Photo Logs with privacy features
+  photoLogs: {
+    fluid: [], // Urine analysis photos
+    gut: [],   // Stool analysis photos
+    dermal: [], // Skin analysis photos
+  },
+
   // Achievements state
   achievements: {
     unlockedIds: [],
@@ -567,6 +574,92 @@ const useStore = create((set, get) => ({
       return { pet, completedMissions, activeMissions };
     });
     get().saveData();
+  },
+
+  // Photo API
+  addPhotoLog: (moduleType, photoData) => {
+    try {
+      const timestamp = new Date().toISOString();
+      const photoLog = {
+        ...photoData,
+        timestamp,
+        id: `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      };
+
+      set((state) => {
+        const photoLogs = { ...state.photoLogs };
+        const modulePhotos = [...(photoLogs[moduleType] || []), photoLog];
+        
+        // Limit to last 30 photos per module for privacy/storage
+        photoLogs[moduleType] = modulePhotos.slice(-30);
+        
+        return { photoLogs };
+      });
+
+      // Schedule auto-deletion for sensitive photos
+      if (moduleType === 'gut' && photoData.autoDelete !== false) {
+        get().schedulePhotoAutoDelete(photoLog.id, moduleType, 10 * 60 * 1000); // 10 minutes
+      }
+
+      get().saveData();
+      return photoLog.id;
+    } catch (error) {
+      console.error('addPhotoLog error:', error);
+      return null;
+    }
+  },
+
+  removePhotoLog: (moduleType, photoId) => {
+    set((state) => {
+      const photoLogs = { ...state.photoLogs };
+      photoLogs[moduleType] = (photoLogs[moduleType] || []).filter(p => p.id !== photoId);
+      return { photoLogs };
+    });
+    get().saveData();
+  },
+
+  clearPhotoLogs: (moduleType) => {
+    set((state) => {
+      const photoLogs = { ...state.photoLogs };
+      photoLogs[moduleType] = [];
+      return { photoLogs };
+    });
+    get().saveData();
+  },
+
+  schedulePhotoAutoDelete: (photoId, moduleType, delayMs) => {
+    setTimeout(() => {
+      const { photoLogs } = get();
+      const photoExists = (photoLogs[moduleType] || []).some(p => p.id === photoId);
+      if (photoExists) {
+        get().removePhotoLog(moduleType, photoId);
+      }
+    }, delayMs);
+  },
+
+  getPhotoHistory: (moduleType, limit = 10) => {
+    const { photoLogs } = get();
+    return (photoLogs[moduleType] || [])
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, limit);
+  },
+
+  exportPhotoData: (moduleType, startDate, endDate) => {
+    const { photoLogs } = get();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    return (photoLogs[moduleType] || [])
+      .filter(photo => {
+        const photoDate = new Date(photo.timestamp);
+        return photoDate >= start && photoDate <= end;
+      })
+      .map(photo => ({
+        timestamp: photo.timestamp,
+        analysis: photo.analysis,
+        uri: photo.uri, // For doctor visits
+        confidence: photo.confidence
+      }));
   },
 }));
 

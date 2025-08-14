@@ -15,6 +15,9 @@ import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
 import HacksSection from '../components/HacksSection';
+import PhotoCapture from '../components/PhotoCapture';
+import PhotoGallery from '../components/PhotoGallery';
+import { analyzeSkinCondition } from '../utils/ColorAnalyzer';
 
 const DermalMapScreen = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -22,9 +25,13 @@ const DermalMapScreen = () => {
   const [skincareNotificationsEnabled, setSkincareNotificationsEnabled] = useState(false);
   const [selectedTime, setSelectedTime] = useState(null);
   const [selectedArea, setSelectedArea] = useState(null);
+  const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false);
+  const [selectedBodyArea, setSelectedBodyArea] = useState('face');
 
   const addHealthLog = useStore((state) => state.addHealthLog);
   const addCredits = useStore((s) => s.addCredits);
+  const addPhotoLog = useStore((state) => state.addPhotoLog);
   const skinLogs = useStore((state) => state.healthLogs.skin);
   const lastLogTime = useStore((s) => s.pet.lastLogTime);
   const [creditBurst, setCreditBurst] = useState(null);
@@ -125,6 +132,70 @@ const DermalMapScreen = () => {
     return todayLogs.filter((log) => log.type === 'observation').length;
   };
 
+  const bodyAreas = [
+    { id: 'face', label: 'Face', guide: 'Position face in center of frame' },
+    { id: 'arm', label: 'Arm', guide: 'Position arm here - ensure good lighting' },
+    { id: 'leg', label: 'Leg', guide: 'Position leg area in frame' },
+    { id: 'back', label: 'Back', guide: 'Have someone help photograph back area' },
+    { id: 'chest', label: 'Chest', guide: 'Position chest area in frame' },
+    { id: 'hands', label: 'Hands', guide: 'Position hands flat in good lighting' }
+  ];
+
+  const handlePhotoCapture = async (photoData) => {
+    try {
+      // Analyze the photo
+      const analysis = analyzeSkinCondition(photoData.uri, selectedBodyArea);
+      
+      // Save photo with analysis
+      const photoId = addPhotoLog('dermal', {
+        ...photoData,
+        analysis,
+        bodyArea: selectedBodyArea,
+        autoDelete: false // Keep skin photos for comparison
+      });
+
+      // Log the health data based on analysis
+      addHealthLog('skin', {
+        type: 'skin_photo',
+        bodyArea: selectedBodyArea,
+        condition: analysis.condition,
+        score: analysis.score,
+        label: `Photo Analysis: ${analysis.condition} (${selectedBodyArea})`,
+        interpretation: analysis.recommendation,
+        photoId,
+        confidence: analysis.confidence
+      });
+
+      setShowPhotoCapture(false);
+      Alert.alert(
+        'Photo Analyzed!', 
+        `Area: ${selectedBodyArea}\nCondition: ${analysis.condition}\nScore: ${analysis.score}/5\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%`
+      );
+
+      // Visual credit burst
+      const earned = 20; // Standard photo analysis points
+      const { width } = Dimensions.get('window');
+      setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
+    } catch (error) {
+      setShowPhotoCapture(false);
+      Alert.alert('Error', 'Failed to analyze photo. Please try again.');
+    }
+  };
+
+  const openPhotoCapture = () => {
+    Alert.alert(
+      'Select Body Area',
+      'Which area would you like to photograph?',
+      bodyAreas.map(area => ({
+        text: area.label,
+        onPress: () => {
+          setSelectedBodyArea(area.id);
+          setShowPhotoCapture(true);
+        }
+      })).concat([{ text: 'Cancel', style: 'cancel' }])
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Vista tabName="dermalMap" moduleType="skin" />
@@ -161,6 +232,22 @@ const DermalMapScreen = () => {
           >
             <Icon name="color-palette" size={24} color="#EC4899" />
             <Text style={styles.actionButtonText}>Log Skin Status</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.actionButton, styles.photoButton]}
+            onPress={openPhotoCapture}
+          >
+            <Icon name="camera" size={24} color="#8B5CF6" />
+            <Text style={[styles.actionButtonText, styles.photoButtonText]}>Photo Analysis</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.actionButton, styles.secondaryButton]}
+            onPress={() => setShowPhotoGallery(true)}
+          >
+            <Icon name="images" size={24} color="#6B7280" />
+            <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>View Photo History</Text>
           </TouchableOpacity>
         </View>
 
@@ -333,6 +420,27 @@ const DermalMapScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Photo Capture Modal with guided overlay */}
+      {showPhotoCapture && (
+        <PhotoCapture
+          analysisType="skin"
+          onCapture={handlePhotoCapture}
+          onClose={() => setShowPhotoCapture(false)}
+          autoBlur={false}
+          guideText={bodyAreas.find(area => area.id === selectedBodyArea)?.guide}
+        />
+      )}
+
+      {/* Photo Gallery Modal */}
+      {showPhotoGallery && (
+        <Modal animationType="slide" presentationStyle="fullScreen">
+          <PhotoGallery
+            moduleType="dermal"
+            onClose={() => setShowPhotoGallery(false)}
+          />
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -440,9 +548,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
+  photoButton: {
+    backgroundColor: '#8B5CF6',
+    marginTop: 12,
+  },
+  photoButtonText: {
+    color: '#FFFFFF',
+  },
   secondaryButton: {
     backgroundColor: '#F3F4F6',
-    marginTop: 10,
+    marginTop: 8,
   },
   secondaryButtonText: {
     color: '#6B7280',

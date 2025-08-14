@@ -15,15 +15,21 @@ import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
 import HacksSection from '../components/HacksSection';
+import PhotoCapture from '../components/PhotoCapture';
+import PhotoGallery from '../components/PhotoGallery';
+import { analyzeStoolType } from '../utils/ColorAnalyzer';
 
 const GutScreen = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showMealModal, setShowMealModal] = useState(false);
   const [mealNotificationsEnabled, setMealNotificationsEnabled] = useState(false);
   const [selectedMealType, setSelectedMealType] = useState(null);
+  const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false);
 
   const addHealthLog = useStore((state) => state.addHealthLog);
   const addCredits = useStore((s) => s.addCredits);
+  const addPhotoLog = useStore((state) => state.addPhotoLog);
   const gutLogs = useStore((state) => state.healthLogs.gut);
   const lastLogTime = useStore((s) => s.pet.lastLogTime);
   const [creditBurst, setCreditBurst] = useState(null);
@@ -107,6 +113,45 @@ const GutScreen = () => {
     setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo });
   };
 
+  const handlePhotoCapture = async (photoData) => {
+    try {
+      // Analyze the photo
+      const analysis = analyzeStoolType(photoData.uri);
+      
+      // Save photo with analysis and auto-delete after 10 minutes
+      const photoId = addPhotoLog('gut', {
+        ...photoData,
+        analysis,
+        autoDelete: true,
+        blurred: true // Auto-blur for privacy
+      });
+
+      // Log the health data based on analysis
+      addHealthLog('gut', {
+        type: 'stool_photo',
+        bristolType: analysis.bristolType,
+        label: `Photo Analysis: ${analysis.typeDescription}`,
+        interpretation: analysis.recommendation,
+        photoId,
+        confidence: analysis.confidence
+      });
+
+      setShowPhotoCapture(false);
+      Alert.alert(
+        'Photo Analyzed!', 
+        `Bristol Type ${analysis.bristolType}: ${analysis.typeDescription}\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%\n\nNote: Photo will auto-delete in 10 minutes for privacy.`
+      );
+
+      // Visual credit burst
+      const earned = 25; // Bonus for photo analysis
+      const { width } = Dimensions.get('window');
+      setCreditBurst({ amount: earned, x: width / 2 - 10, y: 120, combo: false });
+    } catch (error) {
+      setShowPhotoCapture(false);
+      Alert.alert('Error', 'Failed to analyze photo. Please try again.');
+    }
+  };
+
   const getTodayLogs = () => {
     const today = new Date().toDateString();
     return gutLogs.filter((log) => new Date(log.timestamp).toDateString() === today);
@@ -153,6 +198,22 @@ const GutScreen = () => {
           >
             <Icon name="nutrition" size={24} color="#10B981" />
             <Text style={styles.actionButtonText}>Log Gut Status</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.actionButton, styles.photoButton]}
+            onPress={() => setShowPhotoCapture(true)}
+          >
+            <Icon name="camera" size={24} color="#8B5CF6" />
+            <Text style={[styles.actionButtonText, styles.photoButtonText]}>Add Photo Analysis</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.actionButton, styles.secondaryButton]}
+            onPress={() => setShowPhotoGallery(true)}
+          >
+            <Icon name="images" size={24} color="#6B7280" />
+            <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>View Photo History</Text>
           </TouchableOpacity>
         </View>
 
@@ -312,6 +373,26 @@ const GutScreen = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Photo Capture Modal */}
+      {showPhotoCapture && (
+        <PhotoCapture
+          analysisType="stool"
+          onCapture={handlePhotoCapture}
+          onClose={() => setShowPhotoCapture(false)}
+          autoBlur={true}
+        />
+      )}
+
+      {/* Photo Gallery Modal */}
+      {showPhotoGallery && (
+        <Modal animationType="slide" presentationStyle="fullScreen">
+          <PhotoGallery
+            moduleType="gut"
+            onClose={() => setShowPhotoGallery(false)}
+          />
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -419,9 +500,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 8,
   },
+  photoButton: {
+    backgroundColor: '#8B5CF6',
+    marginTop: 12,
+  },
+  photoButtonText: {
+    color: '#FFFFFF',
+  },
   secondaryButton: {
     backgroundColor: '#F3F4F6',
-    marginTop: 10,
+    marginTop: 8,
   },
   secondaryButtonText: {
     color: '#6B7280',
