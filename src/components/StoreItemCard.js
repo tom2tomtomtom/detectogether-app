@@ -8,9 +8,11 @@ export default function StoreItemCard({ type, item, width = 150, height = 180 })
   const equipItem = useStore((s) => s.equipItem);
 
   const unlocked = new Set(((pet.customization?.unlockedItems || {})[type] || []));
-  const equippedKey = type === 'colors' ? 'color' : type === 'accessories' ? 'accessory' : type.slice(0, -1);
+  const equippedKey = type === 'colors' ? 'color' : type === 'accessories' ? 'accessories' : type.slice(0, -1);
   const isOwned = unlocked.has(item.id) || (type === 'colors' && item.id === 'default');
-  const isEquipped = (pet.customization?.equippedItems || {})[equippedKey] === item.id;
+  const isEquipped = Array.isArray((pet.customization?.equippedItems || {})[equippedKey])
+    ? ((pet.customization?.equippedItems || {})[equippedKey] || []).includes(item.id)
+    : (pet.customization?.equippedItems || {})[equippedKey] === item.id;
   const canAfford = (pet.careCredits || 0) >= (item.cost || 0);
 
   const onPress = () => {

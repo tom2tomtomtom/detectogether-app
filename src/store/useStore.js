@@ -40,7 +40,8 @@ const useStore = create((set, get) => ({
     environmentUnlockDates: {},
     customization: {
       unlockedItems: { accessories: [], colors: ['default'], effects: [], environments: [] },
-      equippedItems: { accessory: null, color: 'default', effect: null, environment: null },
+      // Support both legacy single `accessory` and new multi `accessories` list
+      equippedItems: { accessory: null, accessories: [], color: 'default', effect: null, environment: null },
     },
   },
   
@@ -283,11 +284,13 @@ const useStore = create((set, get) => ({
       const customization = { ...(pet.customization || {}) };
       const unlocked = new Set(((customization.unlockedItems || {})[itemType] || []));
       if (!unlocked.has(itemId)) return {};
-      const key = itemType === 'colors' ? 'color' : itemType === 'accessories' ? 'accessory' : itemType === 'effects' ? 'effect' : itemType === 'environments' ? 'environment' : itemType;
+      const key = itemType === 'colors' ? 'color' : itemType === 'accessories' ? 'accessories' : itemType === 'effects' ? 'effect' : itemType === 'environments' ? 'environment' : itemType;
       const equipped = { ...(customization.equippedItems || {}) };
-      if (key === 'accessory') {
-        // Toggle on/off single accessory
-        equipped.accessory = equipped.accessory === itemId ? null : itemId;
+      if (key === 'accessories') {
+        // Multi-select toggle list
+        const current = new Set(equipped.accessories || []);
+        if (current.has(itemId)) current.delete(itemId); else current.add(itemId);
+        equipped.accessories = Array.from(current);
       } else {
         equipped[key] = itemId;
       }
