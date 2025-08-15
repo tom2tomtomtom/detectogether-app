@@ -283,8 +283,17 @@ const useStore = create((set, get) => ({
       const customization = { ...(pet.customization || {}) };
       const unlocked = new Set(((customization.unlockedItems || {})[itemType] || []));
       if (!unlocked.has(itemId)) return {};
-      const key = itemType === 'colors' ? 'color' : itemType === 'accessories' ? 'accessory' : itemType === 'effects' ? 'effect' : itemType === 'environments' ? 'environment' : itemType;
-      customization.equippedItems = { ...(customization.equippedItems || {}), [key]: itemId };
+      const key = itemType === 'colors' ? 'color' : itemType === 'accessories' ? 'accessories' : itemType === 'effects' ? 'effect' : itemType === 'environments' ? 'environment' : itemType;
+      // For accessories, support multi-select toggling (add/remove)
+      const equipped = { ...(customization.equippedItems || {}) };
+      if (key === 'accessories') {
+        const current = new Set(equipped.accessories || []);
+        if (current.has(itemId)) current.delete(itemId); else current.add(itemId);
+        equipped.accessories = Array.from(current);
+      } else {
+        equipped[key] = itemId;
+      }
+      customization.equippedItems = equipped;
       pet.customization = customization;
       return { pet };
     });

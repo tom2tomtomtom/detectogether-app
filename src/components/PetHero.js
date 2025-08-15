@@ -4,8 +4,8 @@ import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import PetCharacter from './PetCharacter';
 
 const PetHero = ({ healthScore = 50, petType = 'cat' }) => {
-  const size = 190;
-  const strokeWidth = 10;
+  const size = 240;
+  const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const strokeDashoffset = circumference - (circumference * Math.max(0, Math.min(100, healthScore))) / 100;
@@ -35,7 +35,7 @@ const PetHero = ({ healthScore = 50, petType = 'cat' }) => {
       </Svg>
 
       <View style={styles.innerCircle}>
-        <PetCharacter petType={petType} healthScore={Math.round(healthScore)} size={80} showAnimation={true} />
+        <PetCharacter petType={petType} healthScore={Math.round(healthScore)} size={120} showAnimation={true} />
         <Text style={styles.percentage}>{Math.round(healthScore)}%</Text>
       </View>
     </View>
@@ -43,23 +43,23 @@ const PetHero = ({ healthScore = 50, petType = 'cat' }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { width: 190, height: 190, alignItems: 'center', justifyContent: 'center' },
+  container: { width: 240, height: 240, alignItems: 'center', justifyContent: 'center' },
   progressRing: { position: 'absolute' },
   innerCircle: {
-    width: 170,
-    height: 170,
-    borderRadius: 85,
+    width: 216,
+    height: 216,
+    borderRadius: 108,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 10,
+    paddingTop: 20,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   },
-  percentage: { marginTop: 5, fontSize: 24, fontWeight: '700', color: '#5856D6' },
+  percentage: { marginTop: 10, fontSize: 28, fontWeight: '700', color: '#5856D6' },
 });
 
 export default PetHero;
