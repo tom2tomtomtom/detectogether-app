@@ -49,11 +49,8 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer ref={navRef}>
         <StatusBar style="auto" />
-        {onboardingComplete ? (
-          <MainStack />
-        ) : (
-          <OnboardingScreen />
-        )}
+        {/* Skip onboarding entirely - tutorial cards will show on home screen for new users */}
+        <MainStack />
       </NavigationContainer>
     </SafeAreaProvider>
   );

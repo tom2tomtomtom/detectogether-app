@@ -56,15 +56,15 @@ export default function AboutScreen({ navigation }) {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Quick actions */}
         <View style={styles.quickRow}>
-          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Profile', { screen: 'PetStore' })}>
+          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('PetStore')}>
             <Icon name="pricetags" size={20} color={colors.primary} />
             <Text style={styles.quickText}>Pet Store</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Stats', { screen: 'Neighborhood' })}>
+          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Neighborhood')}>
             <Icon name="people" size={20} color={colors.primary} />
             <Text style={styles.quickText}>Neighborhood</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('Profile', { screen: 'NotificationSettings' })}>
+          <TouchableOpacity style={styles.quickCard} onPress={() => navigation.navigate('NotificationSettings')}>
             <Icon name="notifications" size={20} color={colors.primary} />
             <Text style={styles.quickText}>Notifications</Text>
           </TouchableOpacity>

@@ -35,6 +35,9 @@ const PetCharacter = ({ petType = 'dog', healthScore = 50, mood, isAnimating = t
   const equippedAccessories = useStore((s) => s.pet?.customization?.equippedItems?.accessories || []);
   const ownedAccessories = useStore((s) => s.pet?.customization?.unlockedItems?.accessories || []);
   const derivedState = mood || getStateFromHealth(healthScore);
+  
+  // Debug: Log mood calculation
+  console.log('🐾 PetCharacter - healthScore:', healthScore, 'derivedState:', derivedState);
 
   const translateY = useSharedValue(0);
   const scale = useSharedValue(1);

@@ -9,11 +9,11 @@ const useStore = create((set, get) => ({
   // User State
   user: {
     name: '',
-    petType: null, // 'dog' or 'cat'
+    petType: 'dog', // Default to dog instead of null
     petName: '',
     petColor: 'default',
-    onboardingComplete: false,
-    tutorialCompleted: false,
+    onboardingComplete: true, // Skip onboarding
+    tutorialCompleted: false, // Show tutorial cards on first use
   },
   
   // Notification preferences
@@ -29,9 +29,9 @@ const useStore = create((set, get) => ({
   
   // Pet State
   pet: {
-    happiness: 50,
-    energy: 50,
-    health: 50,
+    happiness: 75,
+    energy: 75,
+    health: 75,
     level: 1,
     careCredits: 0,
     totalCreditsEarned: 0,
@@ -136,18 +136,106 @@ const useStore = create((set, get) => ({
       .slice()
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
     const hoursSinceLog = (now - new Date(lastLog.timestamp).getTime()) / (1000 * 60 * 60);
-    // Grace period 6h, -2%/h afterwards, max -50%
+    // DEMO MODE: Grace period 1h, -10%/h afterwards, max -70%
     let decay = 0;
-    if (hoursSinceLog > 6) {
-      decay = Math.min(50, Math.floor((hoursSinceLog - 6) * 2));
+    if (hoursSinceLog > 1) {
+      decay = Math.min(70, Math.floor((hoursSinceLog - 1) * 10));
     }
     const baseHealth = state.pet?.health ?? 50;
     return Math.max(10, baseHealth - decay);
   },
   // Re-evaluate pet health when app becomes active
   updatePetHealthOnFocus: () => {
-    const calculatedHealth = get().calculatePetHealth();
-    set((state) => ({ pet: { ...state.pet, health: calculatedHealth } }));
+    console.log('🔄 updatePetHealthOnFocus called');
+    const state = get();
+    const now = Date.now();
+    const allLogs = [
+      ...(state.healthLogs?.hydration || []),
+      ...(state.healthLogs?.energy || []),
+      ...(state.healthLogs?.gut || []),
+      ...(state.healthLogs?.headVision || []),
+      ...(state.healthLogs?.skin || []),
+    ];
+    
+    console.log('📊 Total logs found:', allLogs.length);
+    console.log('📊 Current pet stats:', {
+      health: state.pet?.health,
+      energy: state.pet?.energy,
+      happiness: state.pet?.happiness
+    });
+    
+    let calculatedHealth = state.pet?.health ?? 75;
+    let calculatedEnergy = state.pet?.energy ?? 75;
+    let calculatedHappiness = state.pet?.happiness ?? 75;
+    
+    if (allLogs.length > 0) {
+      const lastLog = allLogs
+        .slice()
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+      const hoursSinceLog = (now - new Date(lastLog.timestamp).getTime()) / (1000 * 60 * 60);
+      
+      console.log('⏰ Hours since last log:', hoursSinceLog);
+      console.log('📝 Last log was:', lastLog);
+      
+      // DEMO MODE: Aggressive decay for visible demo
+      let decay = 0;
+      if (hoursSinceLog > 1) {
+        decay = Math.min(70, Math.floor((hoursSinceLog - 1) * 10));
+      }
+      
+      console.log('📉 Calculated decay:', decay);
+      
+      calculatedHealth = Math.max(5, (state.pet?.health ?? 75) - decay);
+      calculatedEnergy = Math.max(5, (state.pet?.energy ?? 75) - decay);
+      calculatedHappiness = Math.max(5, (state.pet?.happiness ?? 75) - decay);
+      
+      console.log('📊 New calculated stats:', {
+        health: calculatedHealth,
+        energy: calculatedEnergy,
+        happiness: calculatedHappiness
+      });
+    } else {
+      console.log('❌ No logs found - applying demo decay anyway for testing');
+      // DEMO MODE: Apply decay even without logs for demo purposes
+      const resetTime = state.pet?.lastResetTime || (now - 3600000); // Default to 1 hour ago if no reset time
+      const minutesSinceReset = (now - resetTime) / (1000 * 60);
+      console.log('⏰ Current time:', new Date(now).toISOString());
+      console.log('⏰ Reset time:', new Date(resetTime).toISOString());
+      console.log('⏰ Minutes since reset:', minutesSinceReset);
+      console.log('⏰ Current pet stats before decay:', {
+        health: state.pet?.health,
+        energy: state.pet?.energy,
+        happiness: state.pet?.happiness
+      });
+      
+      if (minutesSinceReset > 0.5) { // Start decay after 30 seconds for demo
+        const decay = Math.min(70, Math.floor(minutesSinceReset * 2)); // 2% per minute for faster demo
+        console.log('📉 Demo decay applied:', decay);
+        console.log('📉 Calculation: 75 - decay =', 75 - decay);
+        calculatedHealth = Math.max(5, 75 - decay);
+        calculatedEnergy = Math.max(5, 75 - decay);
+        calculatedHappiness = Math.max(5, 75 - decay);
+        console.log('📊 After decay calculation:', {
+          health: calculatedHealth,
+          energy: calculatedEnergy,
+          happiness: calculatedHappiness
+        });
+      } else {
+        console.log('⏰ Not enough time passed for decay (need >0.5 minutes)');
+      }
+    }
+    
+    set((state) => ({ 
+      pet: { 
+        ...state.pet, 
+        health: calculatedHealth,
+        energy: calculatedEnergy,
+        happiness: calculatedHappiness,
+        lastResetTime: state.pet?.lastResetTime || now
+      } 
+    }));
+    
+    console.log('✅ Pet stats updated');
   },
   
   setUserData: (userData) => {
@@ -214,11 +302,11 @@ const useStore = create((set, get) => ({
     set(() => ({
       user: {
         name: '',
-        petType: null,
+        petType: 'dog', // Default to dog instead of null
         petName: '',
         petColor: 'default',
-        onboardingComplete: false,
-        tutorialCompleted: false,
+        onboardingComplete: true, // Skip onboarding
+        tutorialCompleted: false, // Show tutorial cards on first use
       },
       notifications: {
         enabled: true,
@@ -230,9 +318,9 @@ const useStore = create((set, get) => ({
         lastNotificationTime: null,
       },
       pet: {
-        happiness: 50,
-        energy: 50,
-        health: 50,
+        happiness: 75,
+        energy: 75,
+        health: 75,
         level: 1,
         careCredits: 0,
         totalCreditsEarned: 0,

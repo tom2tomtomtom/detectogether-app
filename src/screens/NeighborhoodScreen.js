@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { useStore } from '../store/useStore';
 
@@ -24,7 +24,30 @@ const HouseCard = ({ item, isYou }) => {
   );
 };
 
+const InfoCard = ({ onDismiss }) => {
+  return (
+    <View style={styles.infoCard}>
+      <View style={styles.infoHeader}>
+        <Text style={styles.infoTitle}>🏘️ Your Health Neighborhood</Text>
+        <TouchableOpacity onPress={onDismiss} style={styles.dismissButton}>
+          <Text style={styles.dismissText}>✕</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.infoDescription}>
+        Connect with neighbors who are also tracking their health! See how everyone's pets are doing and work together toward community goals.
+      </Text>
+      <Text style={styles.infoFeatures}>
+        • Compare health scores with neighbors{'\n'}
+        • Work toward weekly community goals{'\n'}
+        • Unlock rewards when goals are met{'\n'}
+        • See who's been active today
+      </Text>
+    </View>
+  );
+};
+
 export default function NeighborhoodScreen() {
+  const [showInfo, setShowInfo] = useState(true);
   const neighbors = useStore((s) => s.neighborhoodData) || [];
   const stats = useStore((s) => s.communityStats) || { totalLogs: 0, weeklyGoal: 1000 };
   const you = useStore((s) => s.pet);
@@ -36,6 +59,19 @@ export default function NeighborhoodScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Show info card with dismiss option */}
+      {showInfo && <InfoCard onDismiss={() => setShowInfo(false)} />}
+      
+      {/* Show button to bring info back if dismissed */}
+      {!showInfo && (
+        <TouchableOpacity 
+          style={styles.showInfoButton} 
+          onPress={() => setShowInfo(true)}
+        >
+          <Text style={styles.showInfoText}>ℹ️ Show Neighborhood Guide</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Community goal */}
       <View style={styles.goalCard}>
         <Text style={styles.goalTitle}>Neighborhood Goal: {stats.weeklyGoal} logs this week</Text>
@@ -56,6 +92,15 @@ export default function NeighborhoodScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F1F8F6' },
+  infoCard: { backgroundColor: '#FFFFFF', margin: 16, borderRadius: 16, padding: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
+  infoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  infoTitle: { fontSize: 18, fontWeight: '800', color: '#1F2937' },
+  dismissButton: { padding: 8 },
+  dismissText: { fontSize: 18, color: '#6B7280', fontWeight: 'bold' },
+  infoDescription: { marginTop: 12, fontSize: 14, color: '#374151', lineHeight: 20 },
+  infoFeatures: { marginTop: 12, fontSize: 14, color: '#6B7280', lineHeight: 20 },
+  showInfoButton: { margin: 16, padding: 12, backgroundColor: '#E0F2F1', borderRadius: 8, alignItems: 'center' },
+  showInfoText: { color: '#10B981', fontWeight: '600' },
   goalCard: { backgroundColor: '#FFFFFF', margin: 16, borderRadius: 16, padding: 16, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
   goalTitle: { fontSize: 16, fontWeight: '800', color: '#1F2937' },
   goalTrack: { height: 10, backgroundColor: '#E0F2F1', borderRadius: 999, overflow: 'hidden', marginTop: 8 },

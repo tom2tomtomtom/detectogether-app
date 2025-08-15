@@ -100,6 +100,8 @@ const StatsStackScreen = () => (
     <StatsStack.Screen name="Missions" component={MissionsScreen} options={{ headerShown: true, title: 'Weekly Missions' }} />
     <StatsStack.Screen name="Neighborhood" component={NeighborhoodScreen} options={{ headerShown: true, title: 'Neighborhood' }} />
     <StatsStack.Screen name="About" component={AboutScreen} options={{ headerShown: true, title: 'About' }} />
+    <StatsStack.Screen name="PetStore" component={PetStoreScreen} options={{ headerShown: true, title: 'Pet Store' }} />
+    <StatsStack.Screen name="NotificationSettings" component={NotificationSettingsScreen} options={{ headerShown: true, title: 'Notification Settings' }} />
   </StatsStack.Navigator>
 );
 

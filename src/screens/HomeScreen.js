@@ -25,8 +25,40 @@ const HomeScreen = ({ navigation }) => {
   const pet = useStore((state) => state.pet);
   const [selectedMood, setSelectedMood] = useState(3);
   const overallScore = Math.round((pet.health + pet.energy + pet.happiness) / 3);
+  
+  // Debug: Log UI state
+  console.log('🖥️ UI pet stats:', { health: pet.health, energy: pet.energy, happiness: pet.happiness, overallScore });
+  console.log('🎯 PetHero receiving healthScore:', overallScore);
   const progressWidth = 260; // visual width for styles only
   const [creditBurst, setCreditBurst] = useState(null);
+
+  // Real-time pet health updates for demo
+  useEffect(() => {
+    console.log('🕐 Setting up 10-second health decay interval for faster demo');
+    
+    // Update pet health every 10 seconds for immediate demo feedback
+    const interval = setInterval(() => {
+      console.log('⏰ 10-second interval triggered - updating pet health');
+      const updatePetHealthOnFocus = useStore.getState().updatePetHealthOnFocus;
+      updatePetHealthOnFocus();
+    }, 10000); // 10 seconds for faster demo
+
+    return () => {
+      console.log('🛑 Clearing health decay interval');
+      clearInterval(interval);
+    };
+  }, []);
+
+  // DEMO: Complete factory reset for demo
+  const resetAppData = useStore((s) => s.resetAppData);
+  const resetPetForDemo = async () => {
+    console.log('🔴 DEMO RESET: Resetting entire app to new user state');
+    await resetAppData();
+    // Set reset timestamp for demo decay
+    const setPetData = useStore.getState().setPetData;
+    setPetData({ lastResetTime: Date.now() });
+    console.log('✅ DEMO RESET: Complete - app reset to factory defaults with demo decay timer');
+  };
   
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
@@ -251,6 +283,16 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.creditsText}>{pet.careCredits || 0}</Text>
             </TouchableOpacity>
 
+            {/* DEMO: Quick reset button */}
+            <TouchableOpacity
+              style={[styles.creditsButton, { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.3)' }]}
+              onPress={resetPetForDemo}
+              activeOpacity={0.9}
+            >
+              <Icon name="refresh" size={16} color="#EF4444" />
+              <Text style={[styles.creditsText, { color: '#EF4444' }]}>Reset Demo</Text>
+            </TouchableOpacity>
+
           {/* Status text */}
           <Text style={[styles.statusText, { marginTop: 12 }]}>{statusText}</Text>
           </View>
@@ -311,7 +353,12 @@ const HomeScreen = ({ navigation }) => {
         </ScrollView>
         {/* Tutorial overlay on first launch */}
         {!tutorialCompleted && (
-          <TutorialOverlay visible={!tutorialCompleted} onClose={() => {}} />
+          <TutorialOverlay 
+            visible={true} 
+            onClose={() => {
+              // Tutorial completion is handled by the overlay
+            }} 
+          />
         )}
       </SafeAreaView>
     </View>
