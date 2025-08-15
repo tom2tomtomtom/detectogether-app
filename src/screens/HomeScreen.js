@@ -34,14 +34,14 @@ const HomeScreen = ({ navigation }) => {
 
   // Real-time pet health updates for demo
   useEffect(() => {
-    console.log('🕐 Setting up 10-second health decay interval for faster demo');
-    
-    // Update pet health every 10 seconds for immediate demo feedback
+    console.log('🕐 Setting up 1-minute health decay interval');
+
+    // Update pet health every minute for demo
     const interval = setInterval(() => {
-      console.log('⏰ 10-second interval triggered - updating pet health');
+      console.log('⏰ 1-minute interval triggered - updating pet health');
       const updatePetHealthOnFocus = useStore.getState().updatePetHealthOnFocus;
       updatePetHealthOnFocus();
-    }, 10000); // 10 seconds for faster demo
+    }, 60000); // 60 seconds
 
     return () => {
       console.log('🛑 Clearing health decay interval');

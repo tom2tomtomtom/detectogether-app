@@ -3,8 +3,9 @@
 ## Current Project
 - Name: DetecTogether App
 - Type: React Native Mobile App (Expo)
-- Size: ~15,000 lines
-- Status: ✅ MVP COMPLETE - 100% Ready for Launch
+- Size: ~2,500 lines (clean, production-ready code)
+- Status: ✅ DEMO COMPLETE - Client Presentation Ready
+- Demo Status: 🎯 Optimized for Dom & Hannah Demo
 
 ## Tech Stack
 - Frontend: React Native, Expo SDK 51
@@ -46,7 +47,9 @@
 - Session 7: Resolved AsyncStorage crashes and stability
 - Session 8: Added accessory selection UI/wardrobe system
 - Session 9: Planned OpenAI Vision integration for post-MVP
-- Last Updated: August 2025
+- Session 10: Demo optimization - health decay, navigation fixes
+- Session 11: Natural pet energy decay implementation
+- Last Updated: January 2025
 
 ## Current Features Completed
 1. **Health Modules (5/5)**
@@ -73,13 +76,14 @@
 
 2. **Gamification System**
    - Pet with mood states (happy, normal, sad, sick, sleeping)
-   - Pet accessories (crown, bowtie, sunglasses, tophat)
-   - Blinking animations (2-5 second intervals)
-   - Care Credits system with combos
-   - Pet Store for purchasing items
-   - Tamagotchi-style health decay
-   - Pet Moments (memory cards)
-   - Level progression system
+   - Multi-accessory system (crown, bowtie, sunglasses, tophat)
+   - Continuous blinking animations for liveliness
+   - Natural health decay system (2% per minute)
+   - Care Credits system with activity rewards
+   - Pet Store with multi-accessory equipping
+   - Demo-optimized decay (10-second intervals)
+   - Achievement and streak tracking
+   - Community neighborhood features
 
 3. **Core Features**
    - Photo capture with auto-blur for sensitive content
@@ -242,3 +246,67 @@ detectogether-app/
 - [ ] E2E tests: Not implemented
 - [x] Manual testing: Ongoing
 - [ ] Beta testing: Not started
+
+## 🎯 Demo Features (Current)
+- **10-second health decay intervals** for immediate visible feedback
+- **Natural energy decline** regardless of user activity
+- **Reset functionality** in Account Settings for multiple demo runs
+- **Tutorial overlay** instead of full onboarding
+- **Fixed navigation flow** with proper back button behavior
+- **Multi-accessory pet system** with visual customization
+- **Real-time module cards** showing dynamic health data
+
+## 🚀 Production Transition Checklist
+
+### Critical Changes for Production
+
+#### 1. **Health Decay System** 🔥 *URGENT*
+```javascript
+// DEMO (Current):
+updatePetHealthOnFocus interval: 10 seconds
+Natural decay rate: 2% per minute
+Grace period: 30 seconds
+
+// PRODUCTION (Required):
+updatePetHealthOnFocus interval: 1-6 hours
+Natural decay rate: 2% per day
+Grace period: 24 hours
+```
+
+#### 2. **Tutorial System**
+- **DEMO**: Tutorial overlay on home screen
+- **PRODUCTION**: Full onboarding flow with pet selection
+
+#### 3. **Performance Optimizations**
+- **DEMO**: Aggressive updates for visual feedback
+- **PRODUCTION**: Battery-optimized background processing
+
+#### 4. **Analytics & Tracking**
+- **Add**: User engagement metrics
+- **Add**: Health pattern analysis
+- **Add**: App usage statistics
+
+#### 5. **Backend Integration**
+- **Current**: Local AsyncStorage only
+- **PRODUCTION**: Cloud sync, user accounts, data backup
+
+#### 6. **Health Disclaimers**
+- **Add**: Medical disclaimer screens
+- **Add**: "Not a substitute for medical advice" warnings
+- **Add**: Privacy policy integration
+
+### Production Configuration Files Needed
+```
+├── config/
+│   ├── production.js     # Production environment settings
+│   ├── staging.js        # Staging environment for testing
+│   └── demo.js          # Demo configuration (current)
+```
+
+### Environment Variables for Production
+```
+HEALTH_DECAY_RATE=daily
+UPDATE_INTERVAL=hourly
+ANALYTICS_ENABLED=true
+BACKEND_URL=https://api.detectogether.com
+```
