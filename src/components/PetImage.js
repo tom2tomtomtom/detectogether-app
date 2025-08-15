@@ -27,13 +27,13 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories =
     const scale = size / 100;
     switch (t) {
       case 'crown':
-        return { position: 'absolute', width: 50 * scale, height: 40 * scale, top: 10 * scale, left: (size - 50 * scale) / 2, zIndex: 1 };
+        return { position: 'absolute', width: 50 * scale, height: 40 * scale, top: -4 * scale, left: (size - 50 * scale) / 2, zIndex: 1 };
       case 'tophat':
-        return { position: 'absolute', width: 45 * scale, height: 50 * scale, top: 5 * scale, left: (size - 45 * scale) / 2, zIndex: 1 };
+        return { position: 'absolute', width: 46 * scale, height: 52 * scale, top: -6 * scale, left: (size - 46 * scale) / 2, zIndex: 1 };
       case 'bowtie':
-        return { position: 'absolute', width: 40 * scale, height: 25 * scale, top: 50 * scale, left: (size - 40 * scale) / 2, zIndex: 2 };
+        return { position: 'absolute', width: 40 * scale, height: 25 * scale, top: 62 * scale, left: (size - 40 * scale) / 2, zIndex: 2 };
       case 'sunglasses':
-        return { position: 'absolute', width: 50 * scale, height: 20 * scale, top: 30 * scale, left: (size - 50 * scale) / 2, zIndex: 2 };
+        return { position: 'absolute', width: 52 * scale, height: 22 * scale, top: 24 * scale, left: (size - 52 * scale) / 2, zIndex: 2 };
       default:
         return { position: 'absolute' };
     }
