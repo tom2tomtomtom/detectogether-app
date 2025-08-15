@@ -31,6 +31,8 @@ export const getMoodFromTimeSinceLog = (hoursSinceLog) => {
 
 const PetCharacter = ({ petType = 'dog', healthScore = 50, mood, isAnimating = true, size = 80 }) => {
   const user = useStore((s) => s.user);
+  const equippedAccessory = useStore((s) => s.pet?.customization?.equippedItems?.accessory);
+  const ownedAccessories = useStore((s) => s.pet?.customization?.unlockedItems?.accessories || []);
   const derivedState = mood || getStateFromHealth(healthScore);
 
   const translateY = useSharedValue(0);
@@ -89,7 +91,9 @@ const PetCharacter = ({ petType = 'dog', healthScore = 50, mood, isAnimating = t
   const petColor = user?.petColor || 'golden';
 
   const renderPet = () => {
-    return <PetImage mood={derivedState} size={size} accessory={useStore((s)=> s.pet?.customization?.equippedItems?.accessory)} />;
+    // Show all owned accessories plus equipped
+    const all = Array.from(new Set([...(ownedAccessories || []), equippedAccessory].filter(Boolean)));
+    return <PetImage mood={derivedState} size={size} accessory={equippedAccessory} accessories={all} />;
   };
 
   return (
