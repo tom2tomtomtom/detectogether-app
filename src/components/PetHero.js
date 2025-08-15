@@ -114,6 +114,7 @@ export default function PetHero({
                   elevation: 6,
                   alignItems: 'center',
                   justifyContent: 'center',
+                  overflow: 'hidden',
                 }}
               >
                 {/* Only animate the inner pet */}
