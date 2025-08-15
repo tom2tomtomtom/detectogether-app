@@ -52,7 +52,11 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories =
         <Image key={`back-${a}`} source={accessoryImages[a]} style={getAccessoryStyle(a)} resizeMode="contain" />
       ))}
       {/* Pet */}
-      <Image source={petImages[mood] || petImages.normal} style={styles.petImage} resizeMode="contain" />
+      <Image
+        source={petImages[mood] || petImages.normal}
+        style={[styles.petImage, { width: size, height: size }]}
+        resizeMode="contain"
+      />
       {/* Front accessories */}
       {fronts.map((a) => (
         <Image key={`front-${a}`} source={accessoryImages[a]} style={getAccessoryStyle(a)} resizeMode="contain" />
