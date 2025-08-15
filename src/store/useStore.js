@@ -168,61 +168,55 @@ const useStore = create((set, get) => ({
     let calculatedEnergy = state.pet?.energy ?? 75;
     let calculatedHappiness = state.pet?.happiness ?? 75;
     
-    if (allLogs.length > 0) {
-      const lastLog = allLogs
-        .slice()
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-      const hoursSinceLog = (now - new Date(lastLog.timestamp).getTime()) / (1000 * 60 * 60);
+    // Natural decay always applies - pets need constant care like real Tamagotchis
+    const resetTime = state.pet?.lastResetTime || state.pet?.lastUpdateTime || (now - 3600000);
+    const minutesSinceReset = (now - resetTime) / (1000 * 60);
+    
+    console.log('⏰ Current time:', new Date(now).toISOString());
+    console.log('⏰ Last update time:', new Date(resetTime).toISOString());
+    console.log('⏰ Minutes since last update:', minutesSinceReset);
+    console.log('⏰ Current pet stats before decay:', {
+      health: state.pet?.health,
+      energy: state.pet?.energy,
+      happiness: state.pet?.happiness
+    });
+    
+    // Natural decay starts after 30 seconds - 2% per minute for visible demo
+    if (minutesSinceReset > 0.5) {
+      const naturalDecay = Math.min(70, Math.floor(minutesSinceReset * 2));
+      console.log('📉 Natural decay applied:', naturalDecay);
       
-      console.log('⏰ Hours since last log:', hoursSinceLog);
-      console.log('📝 Last log was:', lastLog);
+      calculatedHealth = Math.max(5, 75 - naturalDecay);
+      calculatedEnergy = Math.max(5, 75 - naturalDecay);
+      calculatedHappiness = Math.max(5, 75 - naturalDecay);
       
-      // DEMO MODE: Aggressive decay for visible demo
-      let decay = 0;
-      if (hoursSinceLog > 1) {
-        decay = Math.min(70, Math.floor((hoursSinceLog - 1) * 10));
+      // If user has been logging recently, slow down the decay slightly
+      if (allLogs.length > 0) {
+        const lastLog = allLogs
+          .slice()
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+        const hoursSinceLog = (now - new Date(lastLog.timestamp).getTime()) / (1000 * 60 * 60);
+        
+        console.log('⏰ Hours since last health log:', hoursSinceLog);
+        console.log('📝 Last health log was:', lastLog);
+        
+        // Boost stats based on recent activity (but still apply natural decay)
+        if (hoursSinceLog < 2) { // Recent activity in last 2 hours
+          const recentBoost = 5; // Small boost for recent activity
+          calculatedHealth = Math.min(100, calculatedHealth + recentBoost);
+          calculatedEnergy = Math.min(100, calculatedEnergy + recentBoost);
+          calculatedHappiness = Math.min(100, calculatedHappiness + recentBoost);
+          console.log('💚 Applied recent activity boost of', recentBoost, '%');
+        }
       }
       
-      console.log('📉 Calculated decay:', decay);
-      
-      calculatedHealth = Math.max(5, (state.pet?.health ?? 75) - decay);
-      calculatedEnergy = Math.max(5, (state.pet?.energy ?? 75) - decay);
-      calculatedHappiness = Math.max(5, (state.pet?.happiness ?? 75) - decay);
-      
-      console.log('📊 New calculated stats:', {
+      console.log('📊 Final calculated stats:', {
         health: calculatedHealth,
         energy: calculatedEnergy,
         happiness: calculatedHappiness
       });
     } else {
-      console.log('❌ No logs found - applying demo decay anyway for testing');
-      // DEMO MODE: Apply decay even without logs for demo purposes
-      const resetTime = state.pet?.lastResetTime || (now - 3600000); // Default to 1 hour ago if no reset time
-      const minutesSinceReset = (now - resetTime) / (1000 * 60);
-      console.log('⏰ Current time:', new Date(now).toISOString());
-      console.log('⏰ Reset time:', new Date(resetTime).toISOString());
-      console.log('⏰ Minutes since reset:', minutesSinceReset);
-      console.log('⏰ Current pet stats before decay:', {
-        health: state.pet?.health,
-        energy: state.pet?.energy,
-        happiness: state.pet?.happiness
-      });
-      
-      if (minutesSinceReset > 0.5) { // Start decay after 30 seconds for demo
-        const decay = Math.min(70, Math.floor(minutesSinceReset * 2)); // 2% per minute for faster demo
-        console.log('📉 Demo decay applied:', decay);
-        console.log('📉 Calculation: 75 - decay =', 75 - decay);
-        calculatedHealth = Math.max(5, 75 - decay);
-        calculatedEnergy = Math.max(5, 75 - decay);
-        calculatedHappiness = Math.max(5, 75 - decay);
-        console.log('📊 After decay calculation:', {
-          health: calculatedHealth,
-          energy: calculatedEnergy,
-          happiness: calculatedHappiness
-        });
-      } else {
-        console.log('⏰ Not enough time passed for decay (need >0.5 minutes)');
-      }
+      console.log('⏰ Not enough time passed for decay (need >0.5 minutes)');
     }
     
     set((state) => ({ 
@@ -231,7 +225,8 @@ const useStore = create((set, get) => ({
         health: calculatedHealth,
         energy: calculatedEnergy,
         happiness: calculatedHappiness,
-        lastResetTime: state.pet?.lastResetTime || now
+        lastResetTime: state.pet?.lastResetTime || now,
+        lastUpdateTime: now
       } 
     }));
     
