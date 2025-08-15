@@ -35,7 +35,7 @@ const PetHero = ({ healthScore = 50, petType = 'cat' }) => {
       </Svg>
 
       <View style={styles.innerCircle}>
-        <PetCharacter petType={petType} healthScore={Math.round(healthScore)} size={100} showAnimation={true} />
+        <PetCharacter petType={petType} healthScore={Math.round(healthScore)} size={80} showAnimation={true} />
         <Text style={styles.percentage}>{Math.round(healthScore)}%</Text>
       </View>
     </View>
@@ -52,13 +52,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: 10,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   },
-  percentage: { marginTop: 8, fontSize: 24, fontWeight: '700', color: '#5856D6' },
+  percentage: { marginTop: 5, fontSize: 24, fontWeight: '700', color: '#5856D6' },
 });
 
 export default PetHero;
