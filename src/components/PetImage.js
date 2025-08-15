@@ -20,40 +20,41 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories =
     glasses: require('../../assets/sunglasses.png'),
   };
 
-  // New sizing/positioning rules (more generous sizes and tuned offsets)
+  // Larger sizing/positioning rules for visibility
   const getAccessoryStyle = (type) => {
     const t = type === 'hat' ? 'tophat' : type === 'glasses' ? 'sunglasses' : type;
-    const base = size * 0.4; // 40% of pet size
     switch (t) {
       case 'crown':
-        return { width: base, height: base * 0.7, top: -size * 0.05, left: size * 0.3 };
+        return { width: size * 0.6, height: size * 0.4, top: size * 0.05, left: size * 0.2 };
       case 'tophat':
-        return { width: base * 0.8, height: base, top: -size * 0.08, left: size * 0.32 };
+        return { width: size * 0.5, height: size * 0.5, top: 0, left: size * 0.25 };
       case 'bowtie':
-        return { width: base * 0.7, height: base * 0.5, top: size * 0.4, left: size * 0.35 };
+        return { width: size * 0.4, height: size * 0.3, top: size * 0.5, left: size * 0.3 };
       case 'sunglasses':
-        return { width: base * 0.9, height: base * 0.4, top: size * 0.25, left: size * 0.28 };
+        return { width: size * 0.5, height: size * 0.25, top: size * 0.3, left: size * 0.25 };
       default:
-        return { width: base, height: base, top: 0, left: size * 0.3 };
+        return { width: size * 0.5, height: size * 0.5, top: size * 0.25, left: size * 0.25 };
     }
   };
 
+  const list = [...(accessories && accessories.length ? accessories : accessory ? [accessory] : [])];
+  const hatTypes = ['crown', 'tophat', 'hat'];
+  const frontTypes = ['bowtie', 'sunglasses', 'glasses'];
+  const backs = list.filter((a) => hatTypes.includes(a) && accessoryImages[a]);
+  const fronts = list.filter((a) => frontTypes.includes(a) && accessoryImages[a]);
+
   return (
     <View style={[styles.container, { width: size, height: size }]}>
+      {/* Back accessories (hats) */}
+      {backs.map((a) => (
+        <Image key={`back-${a}`} source={accessoryImages[a]} style={[styles.accessoryImage, getAccessoryStyle(a)]} resizeMode="contain" />
+      ))}
+      {/* Pet */}
       <Image source={petImages[mood] || petImages.normal} style={[styles.petImage, { width: size, height: size }]} resizeMode="contain" />
-      {[...(accessories && accessories.length ? accessories : (accessory ? [accessory] : []))]
-        .filter((a) => !!accessoryImages[a])
-        .map((a) => {
-          const st = getAccessoryStyle(a);
-          return (
-            <Image
-              key={a}
-              source={accessoryImages[a]}
-              style={[styles.accessoryImage, st]}
-              resizeMode="contain"
-            />
-          );
-        })}
+      {/* Front accessories */}
+      {fronts.map((a) => (
+        <Image key={`front-${a}`} source={accessoryImages[a]} style={[styles.accessoryImage, getAccessoryStyle(a), { zIndex: 2 }]} resizeMode="contain" />
+      ))}
     </View>
   );
 };
