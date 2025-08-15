@@ -23,7 +23,7 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories =
   // Positioning with cropped assets (centered math)
   const getAccessoryStyle = (type) => {
     const t = type === 'hat' ? 'tophat' : type === 'glasses' ? 'sunglasses' : type;
-    const base = size * 0.3; // 30% of pet size
+    const base = size * 0.33; // slightly larger baseline for visibility
     switch (t) {
       case 'crown': {
         const w = base;
@@ -31,8 +31,8 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories =
         return { width: w, height: h, position: 'absolute', top: size * 0.08, left: (size - w) / 2, zIndex: 1 };
       }
       case 'tophat': {
-        const w = base * 0.8;
-        const h = base;
+        const w = base * 0.9;
+        const h = base * 1.05;
         return { width: w, height: h, position: 'absolute', top: size * 0.02, left: (size - w) / 2, zIndex: 1 };
       }
       case 'bowtie': {

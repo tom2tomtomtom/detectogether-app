@@ -119,8 +119,8 @@ const HomeScreen = ({ navigation }) => {
   const isSmallScreen = screenHeight < 700;
   const ringSize = isSmallScreen ? 210 : 230;
   const circleSize = isSmallScreen ? 180 : 200;
-  // Reduce pet size by ~33%
-  const petPixel = isSmallScreen ? 104 : 114;
+  // Keep pet proportionate to inner circle to avoid oversizing
+  const petPixel = Math.round(circleSize * 0.6);
 
   return (
     <View style={styles.container}>
