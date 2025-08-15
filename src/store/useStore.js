@@ -40,6 +40,7 @@ const useStore = create((set, get) => ({
     environment: 'starter_room',
     petEnvironmentLevel: 0,
     environmentUnlockDates: {},
+    lastResetTime: Date.now(), // Initialize decay timer to prevent massive initial decay
     customization: {
       unlockedItems: { accessories: [], colors: ['default'], effects: [], environments: [] },
       // Support both legacy single `accessory` and new multi `accessories` list
@@ -170,7 +171,8 @@ const useStore = create((set, get) => ({
     let calculatedHappiness = state.pet?.happiness ?? 75;
     
     // Natural decay always applies - pets need constant care like real Tamagotchis
-    const resetTime = state.pet?.lastResetTime || state.pet?.lastUpdateTime || (now - 3600000);
+    // Use lastResetTime as the baseline, but if not set, use current time to avoid massive decay
+    const resetTime = state.pet?.lastResetTime || now;
     const minutesSinceReset = (now - resetTime) / (1000 * 60);
     
     console.log('⏰ Current time:', new Date(now).toISOString());
@@ -187,9 +189,14 @@ const useStore = create((set, get) => ({
       const naturalDecay = Math.min(70, Math.floor(minutesSinceReset * 1));
       console.log('📉 Natural decay applied:', naturalDecay);
       
-      calculatedHealth = Math.max(5, 75 - naturalDecay);
-      calculatedEnergy = Math.max(5, 75 - naturalDecay);
-      calculatedHappiness = Math.max(5, 75 - naturalDecay);
+      // Calculate decay from initial stats, not current stats (maintains consistent demo behavior)
+      const baseHealth = 75;
+      const baseEnergy = 75; 
+      const baseHappiness = 75;
+      
+      calculatedHealth = Math.max(5, baseHealth - naturalDecay);
+      calculatedEnergy = Math.max(5, baseEnergy - naturalDecay);
+      calculatedHappiness = Math.max(5, baseHappiness - naturalDecay);
       
       // If user has been logging recently, slow down the decay slightly
       if (allLogs.length > 0) {
@@ -346,6 +353,7 @@ const useStore = create((set, get) => ({
         environment: 'starter_room',
         petEnvironmentLevel: 0,
         environmentUnlockDates: {},
+        lastResetTime: Date.now(), // Initialize decay timer to prevent massive initial decay
         customization: {
           unlockedItems: { accessories: [], colors: ['default'], effects: [], environments: [] },
           equippedItems: { accessory: null, accessories: [], color: 'default', effect: null, environment: null },
