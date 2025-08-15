@@ -18,8 +18,8 @@ export default function AboutScreen({ navigation }) {
       content: 'Every health log you make feeds your pet. The more consistent you are, the happier your pet becomes! Watch them grow from 0% to 100%.'
     },
     {
-      title: '💰 Earning Care Credits',
-      content: 'Each log earns you credits:\n• Hydration: 10 credits\n• Energy: 10 credits\n• Gut check: 15 credits\n• Mind check: 10 credits\n• Skin scan: 25 credits'
+      title: '🪙 Earning PetPennies',
+      content: 'Each log earns you PetPennies:\n• Hydration: 10 PetPennies\n• Energy: 10 PetPennies\n• Gut check: 15 PetPennies\n• Mind check: 10 PetPennies\n• Skin scan: 25 PetPennies'
     },
     {
       title: '⏳ Health Decay (Tamagotchi-style)',
@@ -27,7 +27,7 @@ export default function AboutScreen({ navigation }) {
     },
     {
       title: '🏪 Pet Store',
-      content: 'Spend your credits on accessories, colors, and special effects for your pet. Tap the credit count on the home screen to visit!'
+      content: 'Spend your PetPennies on accessories, colors, and special effects for your pet. Tap the PetPennies count on the home screen to visit!'
     },
     {
       title: '🏘️ Neighborhood',
@@ -77,8 +77,8 @@ export default function AboutScreen({ navigation }) {
             <Text style={styles.statLabel}>Day Streak</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{credits}</Text>
-            <Text style={styles.statLabel}>Credits</Text>
+            <Text style={styles.statValue}>🪙 {credits}</Text>
+            <Text style={styles.statLabel}>PetPennies</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statValue}>{totalCredits}</Text>

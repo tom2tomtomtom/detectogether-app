@@ -8,6 +8,7 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import { View, AppState } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from './src/services/NotificationService';
+import SoundService from './src/services/SoundService';
 
 export default function App() {
   const initializeApp = useStore((state) => state.initializeApp);
@@ -16,6 +17,8 @@ export default function App() {
 
   useEffect(() => {
     initializeApp();
+    // Initialize sound service
+    SoundService.initialize();
   }, []);
 
   useEffect(() => {

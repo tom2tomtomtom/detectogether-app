@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SoundService from '../services/SoundService';
 import { ACHIEVEMENTS, ALL_ACHIEVEMENTS, MODULE_KEYS } from '../utils/achievements';
 
 // Debounced persistence to avoid heavy sync writes on rapid logs
@@ -181,9 +182,9 @@ const useStore = create((set, get) => ({
       happiness: state.pet?.happiness
     });
     
-    // Natural decay starts after 30 seconds - 2% per minute for visible demo
+    // Natural decay starts after 30 seconds - 1% per minute for visible demo
     if (minutesSinceReset > 0.5) {
-      const naturalDecay = Math.min(70, Math.floor(minutesSinceReset * 2));
+      const naturalDecay = Math.min(70, Math.floor(minutesSinceReset * 1));
       console.log('📉 Natural decay applied:', naturalDecay);
       
       calculatedHealth = Math.max(5, 75 - naturalDecay);
@@ -200,9 +201,9 @@ const useStore = create((set, get) => ({
         console.log('⏰ Hours since last health log:', hoursSinceLog);
         console.log('📝 Last health log was:', lastLog);
         
-        // Boost stats based on recent activity (but still apply natural decay)
+        // DEMO MODE: Boost stats based on recent activity (but still apply natural decay)
         if (hoursSinceLog < 2) { // Recent activity in last 2 hours
-          const recentBoost = 5; // Small boost for recent activity
+          const recentBoost = 15; // DEMO: Larger boost to counter 1%/min decay (was 5%)
           calculatedHealth = Math.min(100, calculatedHealth + recentBoost);
           calculatedEnergy = Math.min(100, calculatedEnergy + recentBoost);
           calculatedHappiness = Math.min(100, calculatedHappiness + recentBoost);
@@ -219,6 +220,13 @@ const useStore = create((set, get) => ({
       console.log('⏰ Not enough time passed for decay (need >0.5 minutes)');
     }
     
+    // Get previous health for sound effects
+    const previousHealth = state.pet?.health ?? 75;
+    const previousEnergy = state.pet?.energy ?? 75;
+    const previousHappiness = state.pet?.happiness ?? 75;
+    const previousAverage = (previousHealth + previousEnergy + previousHappiness) / 3;
+    const newAverage = (calculatedHealth + calculatedEnergy + calculatedHappiness) / 3;
+    
     set((state) => ({ 
       pet: { 
         ...state.pet, 
@@ -229,6 +237,21 @@ const useStore = create((set, get) => ({
         lastUpdateTime: now
       } 
     }));
+    
+    // Play sound effects based on health changes
+    if (newAverage < 30 && previousAverage >= 30) {
+      // Entered critical state
+      SoundService.playCriticalAlert();
+      console.log('🚨 CRITICAL HEALTH - Playing alert sound');
+    } else if (newAverage < previousAverage - 5) {
+      // Significant health drop
+      SoundService.playHealthDrop();
+      console.log('📉 Health dropped significantly - Playing warning sound');
+    } else if (newAverage > previousAverage + 5) {
+      // Health improvement 
+      SoundService.playHealthImprove();
+      console.log('📈 Health improved - Playing positive sound');
+    }
     
     console.log('✅ Pet stats updated');
   },
@@ -373,6 +396,11 @@ const useStore = create((set, get) => ({
       try { get().updateCommunityProgress(1); } catch (_) {}
       get().updateVistaState(type);
       get().checkAchievements(type);
+      
+      // Play positive sound for health logging
+      SoundService.playHealthImprove();
+      console.log('📝 Health logged - Playing positive feedback sound');
+      
       get().saveData();
     } catch (e) {
       console.error('addHealthLog error:', e);
@@ -460,22 +488,22 @@ const useStore = create((set, get) => ({
     set((state) => {
       const pet = { ...state.pet };
       
-      // Update pet stats based on action
+      // DEMO MODE: Update pet stats based on action (increased for faster demo feedback)
       switch (actionType) {
         case 'hydration':
-          pet.health = Math.min(100, pet.health + 5);
-          pet.energy = Math.min(100, pet.energy + 2);
+          pet.health = Math.min(100, pet.health + 12); // DEMO: was +5
+          pet.energy = Math.min(100, pet.energy + 8);  // DEMO: was +2
           break;
         case 'energy':
-          pet.energy = Math.min(100, pet.energy + 5);
-          pet.happiness = Math.min(100, pet.happiness + 3);
+          pet.energy = Math.min(100, pet.energy + 12);  // DEMO: was +5
+          pet.happiness = Math.min(100, pet.happiness + 8); // DEMO: was +3
           break;
         case 'gut':
-          pet.health = Math.min(100, pet.health + 4);
-          pet.happiness = Math.min(100, pet.happiness + 2);
+          pet.health = Math.min(100, pet.health + 10); // DEMO: was +4
+          pet.happiness = Math.min(100, pet.happiness + 8); // DEMO: was +2
           break;
         default:
-          pet.happiness = Math.min(100, pet.happiness + 2);
+          pet.happiness = Math.min(100, pet.happiness + 8); // DEMO: was +2
       }
       
       // Add care credits

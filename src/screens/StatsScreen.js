@@ -77,7 +77,7 @@ const StatsScreen = () => {
                 <ProgressBar value={missionProgress[m.id] || 0} target={m.target} />
                 <View style={styles.rowBetween}>
                   <Text style={styles.muted}>{missionProgress[m.id] || 0}/{m.target}</Text>
-                  <Text style={styles.rewardText}>🪙 {m.reward?.credits || 0}</Text>
+                  <Text style={styles.rewardText}>🪙 {m.reward?.credits || 0} PetPennies</Text>
                 </View>
               </View>
             ))}

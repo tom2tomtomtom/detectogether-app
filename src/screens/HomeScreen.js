@@ -270,8 +270,7 @@ const HomeScreen = ({ navigation }) => {
               onPress={() => navigation.navigate('Profile', { screen: 'PetStore' })}
               activeOpacity={0.9}
             >
-              <Icon name="wallet" size={16} color="#666" />
-              <Text style={styles.creditsText}>{pet.careCredits || 0}</Text>
+              <Text style={styles.petPenniesText}>🪙 {pet.careCredits || 0} PetPennies</Text>
             </TouchableOpacity>
 
           {/* Status text */}
@@ -318,8 +317,8 @@ const HomeScreen = ({ navigation }) => {
                       <Text style={styles.aboutSubtext}>How it works</Text>
                     ) : (
                       <>
-                        <Text style={styles.moduleStats} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.6}>{summary.main}</Text>
-                        <Text style={styles.lastLogged} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{summary.sub}</Text>
+                        <Text style={styles.moduleStats} numberOfLines={1}>{summary.main}</Text>
+                        <Text style={styles.lastLogged} numberOfLines={1}>{summary.sub}</Text>
                       </>
                     )}
                   </TouchableOpacity>
@@ -412,8 +411,8 @@ const styles = StyleSheet.create({
   miniRow: {
     marginTop: 24,
   },
-  creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 16, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
-  creditsText: { marginLeft: 6, fontSize: 16, fontWeight: '700', color: '#1F2937' },
+  creditsButton: { flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 16, backgroundColor: 'rgba(255,255,255,0.6)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  petPenniesText: { fontSize: 16, fontWeight: '700', color: '#1F2937' },
   moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 0 },
   moduleWrapper: { width: '31%', marginBottom: 12 },
   moduleCard: {
@@ -426,9 +425,9 @@ const styles = StyleSheet.create({
   },
   moduleIcon: { fontSize: 24, marginBottom: 4, textAlign: 'center' },
   moduleEmoji: { fontSize: 22, marginBottom: 4, textAlign: 'center' },
-  moduleName: { fontSize: 13, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
-  moduleStats: { fontSize: 20, fontWeight: 'bold', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
-  lastLogged: { fontSize: 11, color: '#6B7280', textAlign: 'center' },
+  moduleName: { fontSize: 12, fontWeight: '600', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
+  moduleStats: { fontSize: 14, fontWeight: 'bold', color: '#1F2937', textAlign: 'center', marginBottom: 2 },
+  lastLogged: { fontSize: 10, color: '#6B7280', textAlign: 'center' },
   subRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   dotSmall: { width: 8, height: 8, borderRadius: 4, marginLeft: 6, borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)' },
   aboutCard: {
@@ -437,7 +436,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(139, 92, 246, 0.2)',
     borderStyle: 'dashed',
   },
-  aboutSubtext: { fontSize: 11, color: '#6B7280', textAlign: 'center', marginTop: 8 },
+  aboutSubtext: { fontSize: 10, color: '#6B7280', textAlign: 'center', marginTop: 8 },
 });
 
 export default HomeScreen;

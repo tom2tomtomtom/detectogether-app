@@ -38,7 +38,7 @@ export default function MissionsScreen() {
               <ProgressBar value={cur} target={m.target} />
               <View style={styles.rowBetween}>
                 <Text style={styles.meta}>{cur}/{m.target}</Text>
-                <Text style={styles.reward}>🪙 {m.reward?.credits || 0}</Text>
+                <Text style={styles.reward}>🪙 {m.reward?.credits || 0} PetPennies</Text>
               </View>
               <TouchableOpacity
                 disabled={!done}
