@@ -7,6 +7,8 @@ const AccountScreen = ({ navigation }) => {
   const user = useStore((state) => state.user);
   const pet = useStore((state) => state.pet);
 
+  const resetAppData = useStore((s) => s.resetAppData);
+
   const settingsOptions = [
     { icon: 'notifications', label: 'Notification Settings', onPress: () => navigation && navigation.navigate && navigation.navigate('NotificationSettings') },
     { icon: 'cart', label: 'Pet Store', onPress: () => navigation && navigation.navigate && navigation.navigate('PetStore') },
@@ -15,6 +17,7 @@ const AccountScreen = ({ navigation }) => {
     { icon: 'lock-closed', label: 'Privacy & Data', onPress: () => {} },
     { icon: 'people', label: 'Social Settings', onPress: () => {} },
     { icon: 'help-circle', label: 'Support & Info', onPress: () => {} },
+    { icon: 'warning', label: 'Reset App Data', onPress: () => resetAppData() },
   ];
 
   return (

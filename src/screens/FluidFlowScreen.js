@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import Toast from '../components/Toast';
 import HacksSection from '../components/HacksSection';
 import PhotoCapture from '../components/PhotoCapture';
 import PhotoGallery from '../components/PhotoGallery';
@@ -45,8 +46,10 @@ const FluidFlowScreen = () => {
   ];
 
   const lastLogTime = useStore((s) => s.pet.lastLogTime);
+  const pushToast = useStore((s) => s.unlockAchievement); // placeholder not ideal; we will use achievements toast queue
 
   const [creditBurst, setCreditBurst] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const handleColorLog = (option) => {
     if (option.id === 5) { // "Didn't notice/unsure"
@@ -69,6 +72,7 @@ const FluidFlowScreen = () => {
       value: option.id,
       label: option.label,
       interpretation: option.interpretation,
+      colorHex: option.color,
     });
     setShowColorModal(false);
     Alert.alert('Logged!', `${option.label} - ${option.interpretation}`);
@@ -97,15 +101,21 @@ const FluidFlowScreen = () => {
         value: analysis.colorLevel,
         label: `Photo Analysis: ${analysis.hydrationStatus}`,
         interpretation: analysis.recommendation,
+        colorHex: analysis.detectedColor,
         photoId,
         confidence: analysis.confidence
       });
 
       setShowPhotoCapture(false);
-      Alert.alert(
-        'Photo Analyzed!', 
-        `Analysis: ${analysis.hydrationStatus}\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%`
-      );
+      const isWarning = /medical|doctor|seek|attention|consult/i.test(analysis.recommendation || analysis.hydrationStatus || '');
+      if (isWarning) {
+        setToast('Warning! Seek medical attention if symptoms persist.');
+      } else {
+        Alert.alert(
+          'Photo Analyzed!', 
+          `Analysis: ${analysis.hydrationStatus}\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%`
+        );
+      }
 
       // Visual credit burst
       const earned = 15; // Bonus for photo
@@ -267,6 +277,17 @@ const FluidFlowScreen = () => {
           onEnd={() => setCreditBurst(null)}
         />
       )}
+      <Toast
+        visible={!!toast}
+        message={toast}
+        type="warning"
+        actionLabel="Learn more"
+        onAction={() => {
+          setToast(null);
+          Alert.alert('Hydration Warning', 'Dark or unusual urine colors can be caused by dehydration or other conditions. If this persists, contact a healthcare provider.');
+        }}
+        onHide={() => setToast(null)}
+      />
 
       {/* Color Assessment Modal */}
       <Modal

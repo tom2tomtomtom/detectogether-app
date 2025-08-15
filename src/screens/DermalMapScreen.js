@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import Toast from '../components/Toast';
 import HacksSection from '../components/HacksSection';
 import PhotoCapture from '../components/PhotoCapture';
 import PhotoGallery from '../components/PhotoGallery';
@@ -35,6 +36,7 @@ const DermalMapScreen = () => {
   const skinLogs = useStore((state) => state.healthLogs.skin);
   const lastLogTime = useStore((s) => s.pet.lastLogTime);
   const [creditBurst, setCreditBurst] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const skinStatusOptions = [
     { id: 1, label: 'Inflamed', color: '#EF4444', interpretation: 'Irritated – consider calming care' },
@@ -167,10 +169,15 @@ const DermalMapScreen = () => {
       });
 
       setShowPhotoCapture(false);
-      Alert.alert(
-        'Photo Analyzed!', 
-        `Area: ${selectedBodyArea}\nCondition: ${analysis.condition}\nScore: ${analysis.score}/5\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%`
-      );
+      const skinWarning = analysis.score <= 2 || /medical|doctor|seek|attention|consult/i.test(analysis.recommendation || '');
+      if (skinWarning) {
+        setToast('Warning! Skin concern detected. Consider medical advice.');
+      } else {
+        Alert.alert(
+          'Photo Analyzed!', 
+          `Area: ${selectedBodyArea}\nCondition: ${analysis.condition}\nScore: ${analysis.score}/5\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%`
+        );
+      }
 
       // Visual credit burst
       const earned = 20; // Standard photo analysis points
@@ -322,6 +329,17 @@ const DermalMapScreen = () => {
           onEnd={() => setCreditBurst(null)}
         />
       )}
+      <Toast
+        visible={!!toast}
+        message={toast}
+        type="warning"
+        actionLabel="Learn more"
+        onAction={() => {
+          setToast(null);
+          Alert.alert('Skin Warning', 'If a new or worsening skin issue persists, becomes painful, or is accompanied by systemic symptoms, consider consulting a dermatologist.');
+        }}
+        onHide={() => setToast(null)}
+      />
 
       {/* Skin Status Modal */}
       <Modal

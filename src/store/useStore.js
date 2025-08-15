@@ -13,6 +13,7 @@ const useStore = create((set, get) => ({
     petName: '',
     petColor: 'default',
     onboardingComplete: false,
+    tutorialCompleted: false,
   },
   
   // Notification preferences
@@ -198,6 +199,73 @@ const useStore = create((set, get) => ({
     }));
     get().saveData();
   },
+  completeTutorial: () => {
+    set((state) => ({
+      user: { ...state.user, tutorialCompleted: true },
+    }));
+    get().saveData();
+  },
+
+  // Danger zone: reset all persisted data to factory defaults
+  resetAppData: async () => {
+    try {
+      await AsyncStorage.removeItem('userData');
+    } catch (_) {}
+    set(() => ({
+      user: {
+        name: '',
+        petType: null,
+        petName: '',
+        petColor: 'default',
+        onboardingComplete: false,
+        tutorialCompleted: false,
+      },
+      notifications: {
+        enabled: true,
+        morningCheckIn: { enabled: true, time: '08:00' },
+        hydration: { enabled: true, frequencyHours: 2 },
+        modules: { hydration: true, energy: true, gut: true, headVision: true, skin: true },
+        achievements: { enabled: true },
+        streaks: { enabled: true },
+        lastNotificationTime: null,
+      },
+      pet: {
+        happiness: 50,
+        energy: 50,
+        health: 50,
+        level: 1,
+        careCredits: 0,
+        totalCreditsEarned: 0,
+        creditHistory: [],
+        environment: 'starter_room',
+        petEnvironmentLevel: 0,
+        environmentUnlockDates: {},
+        customization: {
+          unlockedItems: { accessories: [], colors: ['default'], effects: [], environments: [] },
+          equippedItems: { accessory: null, accessories: [], color: 'default', effect: null, environment: null },
+        },
+      },
+      healthLogs: { hydration: [], energy: [], gut: [], headVision: [], skin: [] },
+      photoLogs: { fluid: [], gut: [], dermal: [] },
+      achievements: {
+        unlockedIds: [],
+        progress: {},
+        streakDays: 0,
+        lastLogDate: null,
+        moduleCounts: MODULE_KEYS.reduce((acc, k) => ({ ...acc, [k]: 0 }), {}),
+        balancedDays: 0,
+        lastBalancedDate: null,
+        toasts: [],
+      },
+      activeMissions: [],
+      completedMissions: [],
+      missionProgress: {},
+      neighborhoodData: [],
+      communityStats: { totalLogs: 0, activeUsers: 0, weeklyGoal: 1000, unlocked: null },
+    }));
+    try { get().generateMockNeighbors(); } catch (_) {}
+    try { await get().saveData(); } catch (_) {}
+  },
   
   setPetData: (petData) => {
     set((state) => ({
@@ -267,10 +335,15 @@ const useStore = create((set, get) => ({
       unlocked[itemType] = Array.from(list);
       customization.unlockedItems = unlocked;
       // auto-equip first purchase in category
-      const toKey = (t) => (t === 'colors' ? 'color' : t === 'accessories' ? 'accessory' : t === 'effects' ? 'effect' : t === 'environments' ? 'environment' : t);
+      const toKey = (t) => (t === 'colors' ? 'color' : t === 'accessories' ? 'accessories' : t === 'effects' ? 'effect' : t === 'environments' ? 'environment' : t);
       const equipKey = toKey(itemType);
       if (!customization.equippedItems[equipKey]) {
-        customization.equippedItems = { ...(customization.equippedItems || {}), [equipKey]: itemId };
+        // For multi-accessories, start the list with the purchased item
+        if (equipKey === 'accessories') {
+          customization.equippedItems = { ...(customization.equippedItems || {}), accessories: [itemId] };
+        } else {
+          customization.equippedItems = { ...(customization.equippedItems || {}), [equipKey]: itemId };
+        }
       }
       pet.customization = customization;
       pet.careCredits = (pet.careCredits || 0) - cost;

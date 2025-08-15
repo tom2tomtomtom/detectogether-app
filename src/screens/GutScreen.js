@@ -14,6 +14,7 @@ import Vista from '../components/Vista';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CreditAnimation from '../components/CreditAnimation';
+import Toast from '../components/Toast';
 import HacksSection from '../components/HacksSection';
 import PhotoCapture from '../components/PhotoCapture';
 import PhotoGallery from '../components/PhotoGallery';
@@ -33,6 +34,7 @@ const GutScreen = () => {
   const gutLogs = useStore((state) => state.healthLogs.gut);
   const lastLogTime = useStore((s) => s.pet.lastLogTime);
   const [creditBurst, setCreditBurst] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const gutStatusOptions = [
     { id: 1, label: 'Upset', color: '#EF4444', interpretation: 'Troubled digestion – rest and hydrate' },
@@ -137,10 +139,15 @@ const GutScreen = () => {
       });
 
       setShowPhotoCapture(false);
-      Alert.alert(
-        'Photo Analyzed!', 
-        `Bristol Type ${analysis.bristolType}: ${analysis.typeDescription}\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%\n\nNote: Photo will auto-delete in 10 minutes for privacy.`
-      );
+      const gutWarning = (analysis.bristolType === 1 || analysis.bristolType === 7) || /medical|doctor|seek|attention|consult/i.test(analysis.recommendation || '');
+      if (gutWarning) {
+        setToast('Warning! Possible issue detected. Seek medical advice if symptoms persist.');
+      } else {
+        Alert.alert(
+          'Photo Analyzed!', 
+          `Bristol Type ${analysis.bristolType}: ${analysis.typeDescription}\n${analysis.recommendation}\nConfidence: ${Math.round(analysis.confidence * 100)}%\n\nNote: Photo will auto-delete in 10 minutes for privacy.`
+        );
+      }
 
       // Visual credit burst
       const earned = 25; // Bonus for photo analysis
@@ -288,6 +295,17 @@ const GutScreen = () => {
           onEnd={() => setCreditBurst(null)}
         />
       )}
+      <Toast
+        visible={!!toast}
+        message={toast}
+        type="warning"
+        actionLabel="Learn more"
+        onAction={() => {
+          setToast(null);
+          Alert.alert('Gut Warning', 'If you notice severe constipation or diarrhea persisting, along with pain, blood, or fever, contact a healthcare provider.');
+        }}
+        onHide={() => setToast(null)}
+      />
 
       {/* Gut Status Modal */}
       <Modal
