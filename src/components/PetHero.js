@@ -35,7 +35,12 @@ const PetHero = ({ healthScore = 50, petType = 'cat' }) => {
       </Svg>
 
       <View style={styles.innerCircle}>
-        <PetCharacter petType={petType} healthScore={Math.round(healthScore)} size={120} showAnimation={true} />
+        <PetCharacter 
+          petType={petType} 
+          healthScore={Math.round(healthScore)} 
+          size={140}  // BIGGER pet (was 120)
+          showAnimation={true} 
+        />
         <Text style={styles.percentage}>{Math.round(healthScore)}%</Text>
       </View>
     </View>

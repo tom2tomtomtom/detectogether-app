@@ -1,104 +1,116 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
-const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories = [] }) => {
+const PetImage = ({ mood = 'normal', size = 150, accessory = null }) => {
+  const [isBlinking, setIsBlinking] = useState(false);
+  
+  // Regular pet images
   const petImages = {
-    happy: require('../../assets/pet-happy.png'),
-    normal: require('../../assets/pet-normal.png'),
-    sad: require('../../assets/pet-angry.png'), // fallback if pet-sad.png not present
-    sleeping: require('../../assets/pet-sleeping.png'),
-    sick: require('../../assets/pet-sick.png'),
+    happy: require('../../assets/pets/happy.png'),
+    normal: require('../../assets/pets/normal.png'),
+    sad: require('../../assets/pets/sad.png'),
+    sleeping: require('../../assets/pets/sleep.png'),
+    sick: require('../../assets/pets/sick.png'),
   };
-
+  
+  // Blinking versions
+  const petImagesBlinking = {
+    happy: require('../../assets/pets/happy-blink.png'),
+    normal: require('../../assets/pets/normal-blink.png'),
+    sad: require('../../assets/pets/sad-blink.png'),
+    sick: require('../../assets/pets/sick-blink.png'),
+  };
+  
+  // Accessory images - same size as pet, pre-positioned
   const accessoryImages = {
-    crown: require('../../assets/crown.png'),
-    bowtie: require('../../assets/bowtie.png'),
-    sunglasses: require('../../assets/sunglasses.png'),
-    tophat: require('../../assets/tophat.png'),
-    // Back-compat synonyms
-    hat: require('../../assets/tophat.png'),
-    glasses: require('../../assets/sunglasses.png'),
+    crown: require('../../assets/pets/crown.png'),
+    bowtie: require('../../assets/pets/bowtie.png'),
+    sunglasses: require('../../assets/pets/sunnies.png'),
+    tophat: require('../../assets/pets/tophat.png'),
   };
-
-  // Positioning with cropped assets (centered math)
-  const getAccessoryStyle = (type) => {
-    const t = type === 'hat' ? 'tophat' : type === 'glasses' ? 'sunglasses' : type;
-    
-    // Precise positioning for 120px pet
-    switch (t) {
-      case 'crown':
-        return { 
-          position: 'absolute', 
-          width: 80,      
-          height: 64,     
-          top: 10,        // Bottom of crown sits on top of head
-          left: (size - 80) / 2, 
-          zIndex: 1 
-        };
-      case 'tophat':
-        return { 
-          position: 'absolute', 
-          width: 72,      
-          height: 80,     
-          top: 5,         // Bottom of hat sits on top of head
-          left: (size - 72) / 2, 
-          zIndex: 1 
-        };
-      case 'bowtie':
-        return { 
-          position: 'absolute', 
-          width: 64,      
-          height: 40,     
-          top: size * 0.5 - 20,  // Center of pet (50% minus half height)
-          left: (size - 64) / 2, 
-          zIndex: 2 
-        };
-      case 'sunglasses':
-        return { 
-          position: 'absolute', 
-          width: 86,      
-          height: 36,     
-          top: size * 0.3,  // Over eyes (30% down)
-          left: (size - 86) / 2, 
-          zIndex: 2 
-        };
-      default:
-        return { position: 'absolute' };
+  
+  // Blinking animation
+  useEffect(() => {
+    if (mood === 'sleeping') {
+      setIsBlinking(false);
+      return;
     }
+    
+    let blinkTimer;
+    
+    const scheduleNextBlink = () => {
+      const delay = 2000 + Math.random() * 3000;
+      
+      blinkTimer = setTimeout(() => {
+        setIsBlinking(true);
+        
+        setTimeout(() => {
+          setIsBlinking(false);
+          
+          if (Math.random() < 0.2) {
+            setTimeout(() => {
+              setIsBlinking(true);
+              setTimeout(() => {
+                setIsBlinking(false);
+                scheduleNextBlink();
+              }, 150);
+            }, 200);
+          } else {
+            scheduleNextBlink();
+          }
+        }, 150);
+      }, delay);
+    };
+    
+    scheduleNextBlink();
+    
+    return () => {
+      if (blinkTimer) clearTimeout(blinkTimer);
+    };
+  }, [mood]);
+  
+  // Choose which image to show
+  const getImage = () => {
+    if (isBlinking && petImagesBlinking[mood]) {
+      return petImagesBlinking[mood];
+    }
+    return petImages[mood] || petImages.normal;
   };
-
-  const list = [...(accessories && accessories.length ? accessories : accessory ? [accessory] : [])];
-  const hatTypes = ['crown', 'tophat', 'hat'];
-  const frontTypes = ['bowtie', 'sunglasses', 'glasses'];
-  const backs = list.filter((a) => hatTypes.includes(a) && accessoryImages[a]);
-  const fronts = list.filter((a) => frontTypes.includes(a) && accessoryImages[a]);
-
+  
+  // Since all images are same size and pre-positioned, just overlay at full size
+  const imageStyle = {
+    position: 'absolute',
+    width: size,
+    height: size,
+  };
+  
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      {/* Back accessories (hats) */}
-      {backs.map((a) => (
-        <Image key={`back-${a}`} source={accessoryImages[a]} style={getAccessoryStyle(a)} resizeMode="contain" />
-      ))}
-      {/* Pet */}
-      <Image
-        source={petImages[mood] || petImages.normal}
-        style={[styles.petImage, { width: size, height: size }]}
-        resizeMode="contain"
+      {/* Pet base image with blinking */}
+      <Image 
+        source={getImage()} 
+        style={imageStyle} 
+        resizeMode="contain" 
       />
-      {/* Front accessories */}
-      {fronts.map((a) => (
-        <Image key={`front-${a}`} source={accessoryImages[a]} style={getAccessoryStyle(a)} resizeMode="contain" />
-      ))}
+      
+      {/* Accessory overlay - same size, pre-positioned */}
+      {accessory && accessoryImages[accessory] && (
+        <Image 
+          source={accessoryImages[accessory]} 
+          style={imageStyle} 
+          resizeMode="contain" 
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { position: 'relative', alignItems: 'center', justifyContent: 'center' },
-  petImage: { position: 'absolute' },
-  accessoryImage: { position: 'absolute', zIndex: 1 },
+  container: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default PetImage;
-
-

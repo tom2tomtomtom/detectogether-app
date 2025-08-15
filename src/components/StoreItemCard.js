@@ -8,7 +8,7 @@ export default function StoreItemCard({ type, item, width = 150, height = 180 })
   const equipItem = useStore((s) => s.equipItem);
 
   const unlocked = new Set(((pet.customization?.unlockedItems || {})[type] || []));
-  const equippedKey = type === 'colors' ? 'color' : type.slice(0, -1);
+  const equippedKey = type === 'colors' ? 'color' : type === 'accessories' ? 'accessory' : type.slice(0, -1);
   const isOwned = unlocked.has(item.id) || (type === 'colors' && item.id === 'default');
   const isEquipped = (pet.customization?.equippedItems || {})[equippedKey] === item.id;
   const canAfford = (pet.careCredits || 0) >= (item.cost || 0);
@@ -21,8 +21,8 @@ export default function StoreItemCard({ type, item, width = 150, height = 180 })
     }
   };
 
-  const cta = isEquipped ? 'Equipped' : isOwned ? 'Owned' : canAfford ? 'Buy' : `Need ${item.cost - (pet.careCredits || 0)}`;
-  const ctaStyle = isEquipped ? styles.ctaEquipped : isOwned ? styles.ctaOwned : canAfford ? styles.ctaBuy : styles.ctaNeed;
+  const cta = isOwned ? (isEquipped ? 'Unequip' : 'Equip') : canAfford ? 'Buy' : `Need ${item.cost - (pet.careCredits || 0)}`;
+  const ctaStyle = isOwned ? (isEquipped ? styles.ctaOwned : styles.ctaEquipped) : canAfford ? styles.ctaBuy : styles.ctaNeed;
 
   return (
     <View style={[styles.card, { width, height }]}> 
