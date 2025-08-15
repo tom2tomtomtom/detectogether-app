@@ -22,34 +22,20 @@ const PetImage = ({ mood = 'normal', size = 150, accessory = null, accessories =
 
   // Positioning with cropped assets (centered math)
   const getAccessoryStyle = (type) => {
+    // Sizes tuned for a 100px pet; scale relative to current size
     const t = type === 'hat' ? 'tophat' : type === 'glasses' ? 'sunglasses' : type;
-    const base = size * 0.28; // refined baseline so accessories don't look tiny but fit the face
+    const scale = size / 100;
     switch (t) {
-      case 'crown': {
-        const w = base;
-        const h = base * 0.55;
-        return { width: w, height: h, position: 'absolute', top: size * 0.08, left: (size - w) / 2, zIndex: 1 };
-      }
-      case 'tophat': {
-        const w = base * 0.85;
-        const h = base * 1.0;
-        return { width: w, height: h, position: 'absolute', top: size * 0.03, left: (size - w) / 2, zIndex: 1 };
-      }
-      case 'bowtie': {
-        const w = base * 0.78;
-        const h = base * 0.54;
-        return { width: w, height: h, position: 'absolute', top: size * 0.47, left: (size - w) / 2, zIndex: 2 };
-      }
-      case 'sunglasses': {
-        const w = base * 1.05;
-        const h = base * 0.45;
-        return { width: w, height: h, position: 'absolute', top: size * 0.29, left: (size - w) / 2, zIndex: 2 };
-      }
-      default: {
-        const w = base;
-        const h = base;
-        return { width: w, height: h, position: 'absolute', top: size * 0.25, left: (size - w) / 2, zIndex: 1 };
-      }
+      case 'crown':
+        return { position: 'absolute', width: 50 * scale, height: 40 * scale, top: 10 * scale, left: (size - 50 * scale) / 2, zIndex: 1 };
+      case 'tophat':
+        return { position: 'absolute', width: 45 * scale, height: 50 * scale, top: 5 * scale, left: (size - 45 * scale) / 2, zIndex: 1 };
+      case 'bowtie':
+        return { position: 'absolute', width: 40 * scale, height: 25 * scale, top: 50 * scale, left: (size - 40 * scale) / 2, zIndex: 2 };
+      case 'sunglasses':
+        return { position: 'absolute', width: 50 * scale, height: 20 * scale, top: 30 * scale, left: (size - 50 * scale) / 2, zIndex: 2 };
+      default:
+        return { position: 'absolute' };
     }
   };
 
