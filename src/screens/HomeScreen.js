@@ -49,16 +49,7 @@ const HomeScreen = ({ navigation }) => {
     };
   }, []);
 
-  // DEMO: Complete factory reset for demo
-  const resetAppData = useStore((s) => s.resetAppData);
-  const resetPetForDemo = async () => {
-    console.log('🔴 DEMO RESET: Resetting entire app to new user state');
-    await resetAppData();
-    // Set reset timestamp for demo decay
-    const setPetData = useStore.getState().setPetData;
-    setPetData({ lastResetTime: Date.now() });
-    console.log('✅ DEMO RESET: Complete - app reset to factory defaults with demo decay timer');
-  };
+
   
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
@@ -281,16 +272,6 @@ const HomeScreen = ({ navigation }) => {
             >
               <Icon name="wallet" size={16} color="#666" />
               <Text style={styles.creditsText}>{pet.careCredits || 0}</Text>
-            </TouchableOpacity>
-
-            {/* DEMO: Quick reset button */}
-            <TouchableOpacity
-              style={[styles.creditsButton, { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.3)' }]}
-              onPress={resetPetForDemo}
-              activeOpacity={0.9}
-            >
-              <Icon name="refresh" size={16} color="#EF4444" />
-              <Text style={[styles.creditsText, { color: '#EF4444' }]}>Reset Demo</Text>
             </TouchableOpacity>
 
           {/* Status text */}

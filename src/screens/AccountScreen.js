@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { useStore } from '../store/useStore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -8,6 +8,28 @@ const AccountScreen = ({ navigation }) => {
   const pet = useStore((state) => state.pet);
 
   const resetAppData = useStore((s) => s.resetAppData);
+  const setPetData = useStore((s) => s.setPetData);
+
+  const handleResetAppData = async () => {
+    Alert.alert(
+      'Reset App Data',
+      'This will clear all data and restart with demo-ready pet stats (75% health for decay demonstration). Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Reset', 
+          style: 'destructive', 
+          onPress: async () => {
+            console.log('🔴 DEMO RESET: Resetting entire app to demo-ready state');
+            await resetAppData();
+            // Set demo-ready state with timestamp for decay
+            setPetData({ lastResetTime: Date.now() });
+            console.log('✅ DEMO RESET: Complete - app reset with demo decay timer');
+          }
+        }
+      ]
+    );
+  };
 
   const settingsOptions = [
     { icon: 'notifications', label: 'Notification Settings', onPress: () => navigation && navigation.navigate && navigation.navigate('NotificationSettings') },
@@ -17,7 +39,7 @@ const AccountScreen = ({ navigation }) => {
     { icon: 'lock-closed', label: 'Privacy & Data', onPress: () => {} },
     { icon: 'people', label: 'Social Settings', onPress: () => {} },
     { icon: 'help-circle', label: 'Support & Info', onPress: () => {} },
-    { icon: 'warning', label: 'Reset App Data', onPress: () => resetAppData() },
+    { icon: 'warning', label: 'Reset App Data', onPress: handleResetAppData },
   ];
 
   return (
